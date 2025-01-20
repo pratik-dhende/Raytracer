@@ -51,7 +51,7 @@ class Vec3 {
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the code.
-using Point3f = Vec3;
+using Point3 = Vec3;
 
 
 // Vector Utility Functions
