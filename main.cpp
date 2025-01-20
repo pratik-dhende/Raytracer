@@ -1,4 +1,4 @@
-#include "color.h"
+#include "Color.h"
 
 #include <iostream>
 
@@ -11,7 +11,7 @@ int main() {
     for(int i = 0; i < imageHeight; i++) {
         std::clog << "\rScanlines remaining: " << imageHeight - i << " " << std::flush; 
         for(int j = 0; j < imageWidth; j++) {
-            write_color(std::cout, color(static_cast<float>(j) / imageHeight, static_cast<float>(i) / imageWidth, 0.0f));
+            write_color(std::cout, Color(static_cast<float>(j) / imageHeight, static_cast<float>(i) / imageWidth, 0.0f));
         }
     }
 
