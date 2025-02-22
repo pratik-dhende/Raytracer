@@ -1,11 +1,10 @@
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
-#include "Vec3.h"
+#include "Vec3f.h"
 
 #include <iostream>
 
-using Color = Vec3;
+using Color = Vec3f;
 
 void write_color(std::ostream& out, const Color& pixel_color) {
     auto r = pixel_color.r();
@@ -20,5 +19,3 @@ void write_color(std::ostream& out, const Color& pixel_color) {
     // Write out the pixel color components.
     out << rByte << ' ' << gByte << ' ' << bByte << '\n';
 }
-
-#endif
