@@ -68,9 +68,8 @@ public:
         return std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);;
     }
 
-
-    float dot(const Vec3f& other) const {
-        return m_x * other.x() + m_y * other.y() + m_z * other.z();
+    float magnitudeSquared() const {
+        return m_x * m_x + m_y * m_y + m_z * m_z;
     }
 
     Vec3f operator-() {
@@ -91,7 +90,16 @@ public:
         m_z += other.z();
         return *this;
     }
+
+    Vec3f& operator*=(const int scalar) {
+        m_x *= scalar;
+        m_y *= scalar;
+        m_z *= scalar;
+        return *this;
+    }
 };
+
+float dot(const Vec3f& v1, const Vec3f& v2);
 
 Vec3f operator+(const float scalar, const Vec3f& rhs);
 Vec3f operator+(const Vec3f& lhs, const float scalar);
@@ -101,5 +109,8 @@ Vec3f operator*(const float scalar, const Vec3f& rhs);
 Vec3f operator*(const Vec3f& lhs, const float scalar);
 Vec3f operator/(const float scalar, const Vec3f& rhs);
 Vec3f operator/(const Vec3f& lhs, const float scalar);
+
+Vec3f operator*(const int scalar, const Vec3f& rhs);
+Vec3f operator*(const Vec3f& lhs, const int scalar);
 
 using Point3f = Vec3f;

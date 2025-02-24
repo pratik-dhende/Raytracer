@@ -4,19 +4,19 @@
 
 #include <iostream>
 
-float hitSphere(const Point3f &center, const float radius, const Ray& ray) {
+double hitSphere(const Point3f &center, const double radius, const Ray& ray) {
     Vec3f centerRayOrigin = center - ray.origin();
 
-    float a = ray.direction().dot(ray.direction());
-    float b = -2.0f * ray.direction().dot(centerRayOrigin);
-    float c = centerRayOrigin.dot(centerRayOrigin) - radius * radius;
+    float a = ray.direction().magnitudeSquared();
+    float h = dot(ray.direction(), centerRayOrigin);
+    float c = centerRayOrigin.magnitudeSquared() - radius * radius;
 
-    float d = b * b - 4.0f * a * c;
+    float discriminant = h * h - a * c;
 
-    if (b * b - 4.0f * a * c < 0.0f)
-        return -1.0f;
+    if (discriminant < 0.0f)
+        return -1.0;
     
-    return (-b - sqrt(d)) / (2.0f * a);
+    return (h - std::sqrt(discriminant)) / a;
 }
 
 Color getRayColor(const Ray& ray) {
