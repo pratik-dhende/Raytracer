@@ -8,7 +8,7 @@
 Color getRayColor(const Ray& ray, const Hittable& hittable) {
     HitInfo hitInfo;
 
-    if (hittable.hit(ray, 0.0f, F_INFINITY, hitInfo)) {
+    if (hittable.hit(ray, Interval(0.0f, F_INFINITY), hitInfo)) {
         return Color(hitInfo.getNormal()) * 0.5f + 0.5f;
     }
     

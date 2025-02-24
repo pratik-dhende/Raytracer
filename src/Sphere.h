@@ -10,7 +10,7 @@ class Sphere : public Hittable {
 
         }
 
-        bool hit(const Ray& ray, const float rayTMin, const float rayTMax, HitInfo& hitInfo) const override {
+        bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
             Vec3f centerRayOrigin = center - ray.origin();
 
             float a = ray.direction().magnitudeSquared();
@@ -26,11 +26,11 @@ class Sphere : public Hittable {
             float t1 = (h - sqrtDiscriminant) / a;
             float t2 = (h + sqrtDiscriminant) / a;
 
-            if (t1 >= rayTMax || t2 <= rayTMin || t1 <= rayTMin && t2 >= rayTMax) {
+            if (!rayTInterval.surrounds(t1) && !rayTInterval.surrounds(t2)) {
                 return false;
             }
 
-            hitInfo.t = t1 > rayTMin ? t1 : t2;
+            hitInfo.t = rayTInterval.surrounds(t1) ? t1 : t2;
             hitInfo.p = ray.at(hitInfo.t);
             hitInfo.setNormal(ray, (hitInfo.p - this->center) / this->radius);
             

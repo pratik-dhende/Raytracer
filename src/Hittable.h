@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Ray.h"
+#include "Interval.h"
 
 class HitInfo {
 public:
     Point3f p;
     float t ;
-    bool front;
 
     HitInfo() : p(0.0f), normal(0.0f), t(-1.0f), front(false) {}
 
@@ -21,11 +21,12 @@ public:
 
 private:
     Vec3f normal;
+    bool front;
 };
 
 class Hittable {
     public:
         virtual ~Hittable() = default;
 
-        virtual bool hit(const Ray& ray, const float rayTMin, const float rayTMax, HitInfo& hitInfo) const = 0;
+        virtual bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const = 0;
 };

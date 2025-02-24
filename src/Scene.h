@@ -24,13 +24,13 @@ public:
         hittables.emplace_back(hittable);
     }
 
-    bool hit(const Ray& ray, float rayTMin, float rayTMax, HitInfo& hitInfo) const override {
-        float closestT = rayTMax;
+    bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
+        float closestT = rayTInterval.max;
         HitInfo tempHitInfo;
         bool anyHit = false;
 
         for(const auto& hittable : hittables) {
-            if (hittable->hit(ray, rayTMin, closestT, tempHitInfo)) {
+            if (hittable->hit(ray, Interval(rayTInterval.min, closestT), tempHitInfo)) {
                 closestT = tempHitInfo.t;
                 hitInfo = tempHitInfo;
                 anyHit = true;
