@@ -5,21 +5,6 @@
 
 #include <iostream>
 
-float hitSphere(const Point3f &center, const float radius, const Ray& ray) {
-    Vec3f centerRayOrigin = center - ray.origin();
-
-    float a = ray.direction().magnitudeSquared();
-    float h = dot(ray.direction(), centerRayOrigin);
-    float c = centerRayOrigin.magnitudeSquared() - radius * radius;
-
-    float discriminant = h * h - a * c;
-
-    if (discriminant < 0.0f)
-        return -1.0;
-    
-    return (h - std::sqrt(discriminant)) / a;
-}
-
 Color getRayColor(const Ray& ray, const Hittable& hittable) {
     HitInfo hitInfo;
 
