@@ -1,6 +1,7 @@
-#include "Color.h"
-#include "Ray.h"
-#include "Vec3f.h"
+#include "Raytracer.h"
+#include "Scene.h"
+#include "Hittable.h"
+#include "Sphere.h"
 
 #include <iostream>
 
@@ -19,12 +20,11 @@ float hitSphere(const Point3f &center, const float radius, const Ray& ray) {
     return (h - std::sqrt(discriminant)) / a;
 }
 
-Color getRayColor(const Ray& ray) {
-    auto sphereCenter = Point3f(0.0f, 0.0f, -5.0f);
-    auto t = hitSphere(sphereCenter, 3.0f, ray);
-    if (t > 0.0f) {
-        const Vec3f& normal = (ray.at(t) - sphereCenter).normalized();
-        return Color(normal) * 0.5f + 0.5f;
+Color getRayColor(const Ray& ray, const Hittable& hittable) {
+    HitInfo hitInfo;
+
+    if (hittable.hit(ray, 0.0f, F_INFINITY, hitInfo)) {
+        return Color(hitInfo.getNormal()) * 0.5f + 0.5f;
     }
     
     Vec3f unitDirection = ray.direction().normalized();
@@ -37,6 +37,9 @@ int main() {
 
     const int imageWidth = 400;
     const int imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));
+
+    Scene world;
+    world.add(std::make_shared<Sphere>(Point3f(0.0f , 0.0f , -5.0f), 3.0f));
     
     const float viewPortHeight = 2.0f;
     const float viewPortWidth = viewPortHeight * (static_cast<float>(imageWidth) / imageHeight);
@@ -57,7 +60,7 @@ int main() {
             const Point3f pixelPosition = pixel00Position + (static_cast<float>(j) * du) + (static_cast<float>(i)  * dv);
 
             const Ray ray = Ray(pixelPosition, pixelPosition - cameraPosition);
-            const Color rayColor = getRayColor(ray);
+            const Color rayColor = getRayColor(ray, world);
 
             write_color(std::cout, rayColor);
         }

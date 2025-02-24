@@ -72,7 +72,7 @@ public:
         return m_x * m_x + m_y * m_y + m_z * m_z;
     }
 
-    Vec3f operator-() {
+    Vec3f operator-() const {
         return Vec3f(-m_x, -m_y, -m_z);
     }
 
