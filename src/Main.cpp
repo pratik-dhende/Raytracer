@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-double hitSphere(const Point3f &center, const double radius, const Ray& ray) {
+float hitSphere(const Point3f &center, const float radius, const Ray& ray) {
     Vec3f centerRayOrigin = center - ray.origin();
 
     float a = ray.direction().magnitudeSquared();
