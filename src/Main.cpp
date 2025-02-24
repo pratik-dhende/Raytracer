@@ -11,6 +11,7 @@ int main() {
 
     camera.aspectRatio = 16.0f / 9.0f;
     camera.imageWidth = 400;
+    camera.samplesPerPixel = 100;
 
     Scene world;
     world.add(std::make_shared<Sphere>(Point3f(0.0f, 0.0f, -1.0f), 0.5f));

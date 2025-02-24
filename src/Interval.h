@@ -8,7 +8,7 @@ class Interval {
 
     Interval() : min(F_INFINITY), max(-F_INFINITY) {} // Default interval is empty
 
-    Interval(const float _min, const float _max) : min(_min), max(_max) {}
+    constexpr Interval(const float _min, const float _max) : min(_min), max(_max) {}
 
     float size() const {
         return max - min;
@@ -20,6 +20,10 @@ class Interval {
 
     bool surrounds(const float x) const {
         return min < x && x < max;
+    }
+
+    float clamp(const float x) const {
+        return std::max(this->min, std::min(x, this->max));
     }
 
     static const Interval EMPTY, UNIVERSE;

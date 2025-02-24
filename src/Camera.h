@@ -9,9 +9,10 @@ class Camera {
 public:
     float aspectRatio = 1.0f;
     int imageWidth = 100;
+    int samplesPerPixel = 10;
 
 public:
-    void render(const Hittable& world) {
+    void render(const Hittable& world)  {
         init();
 
         std::cout << "P3\n" << this->imageWidth << " " << this->imageHeight << "\n255\n";
@@ -19,12 +20,13 @@ public:
         for(int i = 0; i < this->imageHeight; i++) {
             std::clog << "\rScanlines remaining: " << this->imageHeight - i << " " << std::flush; 
             for(int j = 0; j < this->imageWidth; j++) {
-                const Point3f pixelPosition = pixel00Position + (static_cast<float>(j) * du) + (static_cast<float>(i)  * dv);
+                Color pixelColor = Color(0.0f);
+
+                for(int sample = 0; sample < samplesPerPixel; ++sample) {
+                    pixelColor += rayColor(sampleRay(j, i), world);
+                }
     
-                const Ray ray = Ray(cameraPosition, pixelPosition - cameraPosition);
-                const Color pixelColor = rayColor(ray, world);
-    
-                write_color(std::cout, pixelColor);
+                write_color(std::cout, pixelColor * this->pixelsPerSample);
             }
         }
     
@@ -33,6 +35,7 @@ public:
 
 private:
     int imageHeight;
+    float pixelsPerSample;
 
     Point3f pixel00Position;
     Point3f cameraPosition;
@@ -41,13 +44,14 @@ private:
     Vec3f dv;
 
     void init() {
-        this->imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));
-        
         constexpr float viewPortHeight = 2.0f;
-        const float viewPortWidth = viewPortHeight * (static_cast<float>(imageWidth) / static_cast<float>(imageHeight));
-    
         constexpr float focalLength = 1.0f;
+
+        this->imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));
+        this->pixelsPerSample = 1.0f / static_cast<float>(samplesPerPixel);
         this->cameraPosition = Point3f(0.0f, 0.0f, 0.0f);
+        
+        const float viewPortWidth = viewPortHeight * (static_cast<float>(imageWidth) / static_cast<float>(imageHeight));
     
         Scene world;
         world.add(std::make_shared<Sphere>(Point3f(0.0f, 0.0f, -1.0f), 0.5f));
@@ -73,5 +77,16 @@ private:
         Vec3f unitDirection = ray.direction().normalized();
         auto a = 0.5f * (unitDirection.y() + 1.0f);
         return (1.0f - a) * Color(1.0f) + a * Color(0.5f, 0.7f, 1.0f);
+    }
+
+    Ray sampleRay(const int x, const int y) const {
+        const Point3f offset = sampleSquare();
+        const Point3f samplePosition = pixel00Position + ((static_cast<float>(x) + offset.x()) * du) + ((static_cast<float>(y) + offset.y())  * dv);
+    
+        return Ray(this->cameraPosition, samplePosition - this->cameraPosition);
+    }
+
+    Point3f sampleSquare() const {
+        return Point3f(random() - 0.5f, random() - 0.5f, 0.0f);
     }
 };
