@@ -9,15 +9,15 @@ private:
     float m_z;
 
 public:
-    Vec3f(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {
+    constexpr Vec3f(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {
 
     }
 
-    Vec3f(float scalar) : Vec3f(scalar, scalar, scalar) {
+    constexpr Vec3f(float scalar) : Vec3f(scalar, scalar, scalar) {
 
     }
 
-    Vec3f() : Vec3f(0.0) {
+    constexpr Vec3f() : Vec3f(0.0) {
 
     }
 
