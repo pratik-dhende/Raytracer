@@ -37,20 +37,25 @@ int main() {
 
     const int imageWidth = 400;
     const int imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));
-
-    Scene world;
-    world.add(std::make_shared<Sphere>(Point3f(0.0f , 0.0f , -5.0f), 3.0f));
     
     const float viewPortHeight = 2.0f;
-    const float viewPortWidth = viewPortHeight * (static_cast<float>(imageWidth) / imageHeight);
+    const float viewPortWidth = viewPortHeight * (static_cast<float>(imageWidth) / static_cast<float>(imageHeight));
 
     const float focalLength = 1.0f;
     const Point3f cameraPosition = Point3f(0.0f, 0.0f, 0.0f);
 
-    const Point3f pixel00Position = cameraPosition - Point3f(viewPortWidth * 0.5f, -viewPortHeight * 0.5f, focalLength);
+    Scene world;
+    world.add(std::make_shared<Sphere>(Point3f(0.0f, 0.0f, -1.0f), 0.5f));
+    world.add(std::make_shared<Sphere>(Point3f(0.0f, -100.5f, -1.0f), 100.0f));
 
-    const Vec3f du = Vec3f(viewPortWidth / imageWidth, 0.0f, 0.0f);
-    const Vec3f dv = Vec3f(0.0f, -viewPortHeight / imageHeight, 0.0f);
+    const Vec3f viewportU = Vec3f(viewPortWidth, 0.0f, 0.0f);
+    const Vec3f viewportV = Vec3f(0.0f, -viewPortHeight, 0.0f);
+
+    const Vec3f du = viewportU / static_cast<float>(imageWidth);
+    const Vec3f dv = viewportV / static_cast<float>(imageHeight);
+
+    const Point3f viewportUpperLeft = cameraPosition - Vec3f(0.0f, 0.0f, focalLength) - viewportU / 2.0f - viewportV / 2.0f;
+    const Point3f pixel00Position = viewportUpperLeft + 0.5f * (du + dv);
 
     std::cout << "P3\n" << imageWidth << " " << imageHeight << "\n255\n";
 
@@ -59,7 +64,7 @@ int main() {
         for(int j = 0; j < imageWidth; j++) {
             const Point3f pixelPosition = pixel00Position + (static_cast<float>(j) * du) + (static_cast<float>(i)  * dv);
 
-            const Ray ray = Ray(pixelPosition, pixelPosition - cameraPosition);
+            const Ray ray = Ray(cameraPosition, pixelPosition - cameraPosition);
             const Color rayColor = getRayColor(ray, world);
 
             write_color(std::cout, rayColor);
