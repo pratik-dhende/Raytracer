@@ -3,10 +3,13 @@
 #include "Ray.h"
 #include "Interval.h"
 
+class Material;
+
 class HitInfo {
 public:
     Point3 p;
     double t ;
+    std::shared_ptr<Material> material;
 
     HitInfo() : p(0.0), normal(0.0), t(-1.0), front(false) {}
 

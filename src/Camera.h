@@ -54,10 +54,6 @@ private:
         
         const double viewPortWidth = viewPortHeight * (static_cast<double>(imageWidth) / static_cast<double>(imageHeight));
     
-        Scene world;
-        world.add(std::make_shared<Sphere>(Point3(0.0, 0.0, -1.0), 0.5));
-        world.add(std::make_shared<Sphere>(Point3(0.0, -100.5, -1.0), 100.0));
-    
         const Vec3 viewportU = Vec3(viewPortWidth, 0.0, 0.0);
         const Vec3 viewportV = Vec3(0.0, -viewPortHeight, 0.0);
     
@@ -76,8 +72,14 @@ private:
         HitInfo hitInfo;
 
         if (world.hit(ray, Interval(0.001, POSITIVE_INFINITY), hitInfo)) {
-            auto reflectedRay = hitInfo.getNormal() + Vec3::randomUnitVector();
-            return 0.5 * rayColor(Ray(hitInfo.p, reflectedRay), world, depth - 1);
+            Color attenuation;
+            Ray scatteredRay;
+
+            if (hitInfo.material->scatter(ray, hitInfo, attenuation, scatteredRay)) {
+                return attenuation * rayColor(scatteredRay, world, depth - 1);
+            }
+
+            return Color(0.0);
         }
         
         Vec3 unitDirection = ray.direction().normalized();

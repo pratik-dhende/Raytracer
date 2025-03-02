@@ -4,6 +4,20 @@
 
 #include <cmath>
 
+class Vec3;
+
+Vec3 operator+(const double scalar, const Vec3& rhs);
+Vec3 operator+(const Vec3& lhs, const double scalar);
+Vec3 operator-(const double scalar, const Vec3& rhs);
+Vec3 operator-(const Vec3& lhs, const double scalar);
+Vec3 operator*(const double scalar, const Vec3& rhs);
+Vec3 operator*(const Vec3& lhs, const double scalar);
+Vec3 operator/(const double scalar, const Vec3& rhs);
+Vec3 operator/(const Vec3& lhs, const double scalar);
+
+Vec3 operator*(const int scalar, const Vec3& rhs);
+Vec3 operator*(const Vec3& lhs, const int scalar);
+
 class Vec3 {
 private:
     double m_x;
@@ -86,6 +100,10 @@ public:
         return Vec3(m_x - other.x(), m_y - other.y(), m_z - other.z());
     }
 
+    Vec3 operator*(const Vec3& other) const {
+        return Vec3(m_x * other.x(), m_y * other.y(), m_z * other.z());
+    }
+
     Vec3& operator+=(const Vec3& other) {
         m_x += other.x();
         m_y += other.y();
@@ -98,6 +116,11 @@ public:
         m_y *= scalar;
         m_z *= scalar;
         return *this;
+    }
+    
+    bool nearZero() const {
+        auto eps = 1e-8;
+        return (std::abs(m_x) < eps) && (std::abs(m_y) < eps) && (std::abs(m_z) < eps);
     }
 
     static Vec3 random() {
@@ -126,21 +149,13 @@ public:
             return -unitSphereVector;
     }
 
+    static Vec3 reflect(const Vec3& v, const Vec3& normal) {
+        return v - 2.0 * dot(v, normal) * normal;
+    }
+
     static double dot(const Vec3& v1, const Vec3& v2) {
         return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
     }
 };
-
-Vec3 operator+(const double scalar, const Vec3& rhs);
-Vec3 operator+(const Vec3& lhs, const double scalar);
-Vec3 operator-(const double scalar, const Vec3& rhs);
-Vec3 operator-(const Vec3& lhs, const double scalar);
-Vec3 operator*(const double scalar, const Vec3& rhs);
-Vec3 operator*(const Vec3& lhs, const double scalar);
-Vec3 operator/(const double scalar, const Vec3& rhs);
-Vec3 operator/(const Vec3& lhs, const double scalar);
-
-Vec3 operator*(const int scalar, const Vec3& rhs);
-Vec3 operator*(const Vec3& lhs, const int scalar);
 
 using Point3 = Vec3;

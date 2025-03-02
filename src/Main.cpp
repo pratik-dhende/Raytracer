@@ -3,6 +3,7 @@
 #include "Hittable.h"
 #include "Sphere.h"
 #include "Camera.h"
+#include "Material.h"
 
 #include <iostream>
 
@@ -15,8 +16,15 @@ int main() {
     camera.maxDepth = 50;
 
     Scene world;
-    world.add(std::make_shared<Sphere>(Point3(0.0, 0.0, -1.0), 0.5));
-    world.add(std::make_shared<Sphere>(Point3(0.0, -100.5, -1.0), 100.0));
+    auto groundMaterial = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
+    auto centerMaterial = std::make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
+    auto leftMaterial   = std::make_shared<Metal>(Color(0.8, 0.8, 0.8));
+    auto rightMaterial  = std::make_shared<Metal>(Color(0.8, 0.6, 0.2));
+
+    world.add(std::make_shared<Sphere>(Point3( 0.0, -100.5, -1.0), 100.0, groundMaterial));
+    world.add(std::make_shared<Sphere>(Point3( 0.0,    0.0, -1.2),   0.5, centerMaterial));
+    world.add(std::make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),   0.5, leftMaterial));
+    world.add(std::make_shared<Sphere>(Point3( 1.0,    0.0, -1.0),   0.5, rightMaterial));
 
     camera.render(world);
 
