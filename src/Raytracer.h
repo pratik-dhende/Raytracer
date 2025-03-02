@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vec3f.h"
+#include "Vec3.h"
 #include "Ray.h"
 #include "Color.h"
 #include "Interval.h"

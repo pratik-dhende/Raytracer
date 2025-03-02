@@ -6,25 +6,25 @@
 
 class Sphere : public Hittable {
     public:
-        Sphere(const Point3f& _center, const float _radius) : center(_center), radius(std::max(0.0f, _radius)) {
+        Sphere(const Point3& _center, const double _radius) : center(_center), radius(std::max(0.0, _radius)) {
 
         }
 
         bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
-            Vec3f centerRayOrigin = center - ray.origin();
+            Vec3 centerRayOrigin = center - ray.origin();
 
-            float a = ray.direction().magnitudeSquared();
-            float h = dot(ray.direction(), centerRayOrigin);
-            float c = centerRayOrigin.magnitudeSquared() - radius * radius;
+            double a = ray.direction().magnitudeSquared();
+            double h = Vec3::dot(ray.direction(), centerRayOrigin);
+            double c = centerRayOrigin.magnitudeSquared() - radius * radius;
 
-            float discriminant = h * h - a * c;
+            double discriminant = h * h - a * c;
 
-            if (discriminant < 0.0f)
+            if (discriminant < 0.0)
                 return false;
             
-            float sqrtDiscriminant = std::sqrt(discriminant);
-            float t1 = (h - sqrtDiscriminant) / a;
-            float t2 = (h + sqrtDiscriminant) / a;
+            double sqrtDiscriminant = std::sqrt(discriminant);
+            double t1 = (h - sqrtDiscriminant) / a;
+            double t2 = (h + sqrtDiscriminant) / a;
 
             if (!rayTInterval.surrounds(t1) && !rayTInterval.surrounds(t2)) {
                 return false;
@@ -38,6 +38,6 @@ class Sphere : public Hittable {
         }
 
     private:
-        Point3f center;
-        float radius;
+        Point3 center;
+        double radius;
 };

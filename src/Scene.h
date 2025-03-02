@@ -25,7 +25,7 @@ public:
     }
 
     bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
-        float closestT = rayTInterval.max;
+        double closestT = rayTInterval.max;
         HitInfo tempHitInfo;
         bool anyHit = false;
 

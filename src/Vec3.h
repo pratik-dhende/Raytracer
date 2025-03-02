@@ -1,0 +1,146 @@
+#pragma once
+
+#include "Utility.h"
+
+#include <cmath>
+
+class Vec3 {
+private:
+    double m_x;
+    double m_y;
+    double m_z;
+
+public:
+    constexpr Vec3(double x, double y, double z) : m_x(x), m_y(y), m_z(z) {
+
+    }
+
+    constexpr Vec3(double scalar) : Vec3(scalar, scalar, scalar) {
+
+    }
+
+    constexpr Vec3() : Vec3(0.0) {
+
+    }
+
+    void normalize() {
+        double mag = magnitude();
+        if (mag == 0.0) {
+            return;
+        }
+
+        m_x /= mag;
+        m_y /= mag;
+        m_z /= mag;
+    }
+
+    Vec3 normalized() const {
+        double mag = magnitude();
+        if (mag == 0.0) {
+            return Vec3(0.0);
+        }
+        return Vec3(m_x / mag, m_y / mag, m_z / mag);
+    }
+
+    double x() const {
+        return m_x;
+    }
+
+    double y() const {
+        return m_y;
+    }
+
+    double z() const {
+        return m_z;
+    }
+
+    double r() const {
+        return m_x;
+    }
+
+    double g() const {
+        return m_y;
+    }
+
+    double b() const {
+        return m_z;
+    }
+
+    double magnitude() const {
+        return std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);;
+    }
+
+    double magnitudeSquared() const {
+        return m_x * m_x + m_y * m_y + m_z * m_z;
+    }
+
+    Vec3 operator-() const {
+        return Vec3(-m_x, -m_y, -m_z);
+    }
+
+    Vec3 operator+(const Vec3& other) const {
+        return Vec3(m_x + other.x(), m_y + other.y(), m_z + other.z());
+    }
+
+    Vec3 operator-(const Vec3& other) const {
+        return Vec3(m_x - other.x(), m_y - other.y(), m_z - other.z());
+    }
+
+    Vec3& operator+=(const Vec3& other) {
+        m_x += other.x();
+        m_y += other.y();
+        m_z += other.z();
+        return *this;
+    }
+
+    Vec3& operator*=(const int scalar) {
+        m_x *= scalar;
+        m_y *= scalar;
+        m_z *= scalar;
+        return *this;
+    }
+
+    static Vec3 random() {
+        return Vec3(::random(), ::random(), ::random());
+    }
+
+    static Vec3 random(const double min, const double max) {
+        return Vec3(::random(min, max), ::random(min, max), ::random(min, max));
+    }
+
+    static Vec3 randomUnitVector() {
+        while(true) {
+            auto p = Vec3::random(-1.0, 1.0);
+            double magnitudeSquared = p.magnitudeSquared();
+            if (1.0e-10 < magnitudeSquared && magnitudeSquared <= 1.0) {
+                return p.normalized();
+            }
+        }
+    }
+
+    static Vec3 randomUnitHemisphere(const Vec3& normal) {
+        Vec3 unitSphereVector = randomUnitVector();
+        if (Vec3::dot(unitSphereVector, normal) > 0.0)
+            return unitSphereVector;
+        else
+            return -unitSphereVector;
+    }
+
+    static double dot(const Vec3& v1, const Vec3& v2) {
+        return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
+    }
+};
+
+Vec3 operator+(const double scalar, const Vec3& rhs);
+Vec3 operator+(const Vec3& lhs, const double scalar);
+Vec3 operator-(const double scalar, const Vec3& rhs);
+Vec3 operator-(const Vec3& lhs, const double scalar);
+Vec3 operator*(const double scalar, const Vec3& rhs);
+Vec3 operator*(const Vec3& lhs, const double scalar);
+Vec3 operator/(const double scalar, const Vec3& rhs);
+Vec3 operator/(const Vec3& lhs, const double scalar);
+
+Vec3 operator*(const int scalar, const Vec3& rhs);
+Vec3 operator*(const Vec3& lhs, const int scalar);
+
+using Point3 = Vec3;

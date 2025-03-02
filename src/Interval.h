@@ -4,30 +4,30 @@
 
 class Interval {
   public:
-    float min, max;
+    double min, max;
 
-    Interval() : min(F_INFINITY), max(-F_INFINITY) {} // Default interval is empty
+    Interval() : min(POSITIVE_INFINITY), max(-POSITIVE_INFINITY) {} // Default interval is empty
 
-    constexpr Interval(const float _min, const float _max) : min(_min), max(_max) {}
+    constexpr Interval(const double _min, const double _max) : min(_min), max(_max) {}
 
-    float size() const {
+    double size() const {
         return max - min;
     }
 
-    bool contains(const float x) const {
+    bool contains(const double x) const {
         return min <= x && x <= max;
     }
 
-    bool surrounds(const float x) const {
+    bool surrounds(const double x) const {
         return min < x && x < max;
     }
 
-    float clamp(const float x) const {
+    double clamp(const double x) const {
         return std::max(this->min, std::min(x, this->max));
     }
 
     static const Interval EMPTY, UNIVERSE;
 };
 
-const Interval Interval::EMPTY    = Interval(F_INFINITY, -F_INFINITY);
-const Interval Interval::UNIVERSE = Interval(-F_INFINITY, F_INFINITY);
+const Interval Interval::EMPTY    = Interval(POSITIVE_INFINITY, -POSITIVE_INFINITY);
+const Interval Interval::UNIVERSE = Interval(-POSITIVE_INFINITY, POSITIVE_INFINITY);

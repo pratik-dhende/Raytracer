@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Vec3f.h"
+#include "Vec3.h"
 #include "Interval.h"
 
 #include <iostream>
 
-using Color = Vec3f;
+using Color = Vec3;
 
 void write_color(std::ostream& out, const Color& pixel_color) {
     auto r = pixel_color.r();
@@ -13,11 +13,11 @@ void write_color(std::ostream& out, const Color& pixel_color) {
     auto b = pixel_color.b();
 
     // Translate the [0,1] component values to the byte range [0,255].
-    constexpr Interval interval(0.0f, 1.0f);
+    constexpr Interval interval(0.0, 0.999);
 
-    int rByte = static_cast<int>(255.999 * interval.clamp(r));
-    int gByte = static_cast<int>(255.999 * interval.clamp(g));
-    int bByte = static_cast<int>(255.999 * interval.clamp(b));
+    int rByte = static_cast<int>(256 * interval.clamp(r));
+    int gByte = static_cast<int>(256 * interval.clamp(g));
+    int bByte = static_cast<int>(256 * interval.clamp(b));
 
     // Write out the pixel color components.
     out << rByte << ' ' << gByte << ' ' << bByte << '\n';

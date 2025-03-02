@@ -5,22 +5,22 @@
 
 class HitInfo {
 public:
-    Point3f p;
-    float t ;
+    Point3 p;
+    double t ;
 
-    HitInfo() : p(0.0f), normal(0.0f), t(-1.0f), front(false) {}
+    HitInfo() : p(0.0), normal(0.0), t(-1.0), front(false) {}
 
-    void setNormal(const Ray& ray, const Vec3f& unitNormal) {
-        this->front = dot(ray.direction(), unitNormal) < 0.0f;
+    void setNormal(const Ray& ray, const Vec3& unitNormal) {
+        this->front = Vec3::dot(ray.direction(), unitNormal) < 0.0;
         this->normal = this->front ? unitNormal : -unitNormal;
     }
 
-    Vec3f getNormal() const {
+    Vec3 getNormal() const {
         return normal;
     }
 
 private:
-    Vec3f normal;
+    Vec3 normal;
     bool front;
 };
 

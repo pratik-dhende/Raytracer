@@ -3,19 +3,19 @@
 #include <limits>
 #include <random>
 
-inline constexpr float F_INFINITY = std::numeric_limits<float>::infinity();
-inline constexpr float F_PI = 3.1415926535897932385f;
+inline constexpr double POSITIVE_INFINITY = std::numeric_limits<double>::infinity();
+inline constexpr double PI = 3.1415926535897932385;
 
-inline float degreesToRadians(const float degree) {
-    return degree * F_PI / 180.0f;
+static inline double degreesToRadians(const double degree) {
+    return degree * PI / 180.0;
 }
 
-inline float random() {
-    static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+static inline double random() {
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
     static std::mt19937 generator;
     return distribution(generator);
 }
 
-inline float random(float min, float max) {
+static inline double random(double min, double max) {
     return min + (max - min) * random();
 }
