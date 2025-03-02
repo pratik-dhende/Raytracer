@@ -56,8 +56,21 @@ class Dielectric : public Material {
         Dielectric(const double refractiveIndex) : refractiveIndex(refractiveIndex) {}
 
         bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const override {
-            double etaSurroundingOverEtaMaterial = hitInfo.getFront() ? 1.0 / this->refractiveIndex : this->refractiveIndex;
-            auto scatteringDirection = Vec3::refract(rayIn.direction().normalized(), hitInfo.getNormal(), etaSurroundingOverEtaMaterial);
+            double etaSurroundingOverEtaMaterial = hitInfo.getFront() ? (1.0 / this->refractiveIndex) : this->refractiveIndex;
+
+            auto unitRayInDirection = rayIn.direction().normalized();
+
+            double cosTheta = std::min(Vec3::dot(-unitRayInDirection, hitInfo.getNormal()), 1.0);
+            double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+            
+            Vec3 scatteringDirection;
+            if (etaSurroundingOverEtaMaterial * sinTheta > 1.0) {
+                scatteringDirection = Vec3::reflect(unitRayInDirection, hitInfo.getNormal());
+            }
+            else {
+                scatteringDirection = Vec3::refract(unitRayInDirection, hitInfo.getNormal(), etaSurroundingOverEtaMaterial);
+            }
+
             scatteredRay = Ray(hitInfo.p, scatteringDirection);
             attenuation = Color(1.0);
             return true;
