@@ -76,7 +76,7 @@ private:
         HitInfo hitInfo;
 
         if (world.hit(ray, Interval(0.001, POSITIVE_INFINITY), hitInfo)) {
-            auto reflectedRay = Vec3::randomUnitHemisphere(hitInfo.getNormal());
+            auto reflectedRay = hitInfo.getNormal() + Vec3::randomUnitVector();
             return 0.5 * rayColor(Ray(hitInfo.p, reflectedRay), world, depth - 1);
         }
         
