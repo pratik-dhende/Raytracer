@@ -112,7 +112,7 @@ public:
         while(true) {
             auto p = Vec3::random(-1.0, 1.0);
             double magnitudeSquared = p.magnitudeSquared();
-            if (1.0e-10 < magnitudeSquared && magnitudeSquared <= 1.0) {
+            if (1.0e-160 < magnitudeSquared && magnitudeSquared <= 1.0) {
                 return p.normalized();
             }
         }
