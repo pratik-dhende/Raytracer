@@ -12,6 +12,11 @@ public:
     int samplesPerPixel = 10;
     int maxDepth = 10;
 
+    double vertifcalFov = 90.0;
+    Point3 eyePosition = Point3(0.0);
+    Point3 lookAtPosition = Point3(0.0, 0.0, -1.0);
+    Vec3 up = Point3(0.0, 1.0, 0.0);
+
 public:
     void render(const Hittable& world)  {
         init();
@@ -39,28 +44,35 @@ private:
     double pixelsPerSample;
 
     Point3 pixel00Position;
-    Point3 cameraPosition;
 
     Vec3 du;
     Vec3 dv;
 
-    void init() {
-        constexpr double viewPortHeight = 2.0;
-        constexpr double focalLength = 1.0;
+    Vec3 u;
+    Vec3 v;
+    Vec3 w;
 
+    void init() {
+        const double focalLength = (lookAtPosition - eyePosition).magnitude();
+        const double verticalFovRadians = degreesToRadians(vertifcalFov);
+        
+        const double viewPortHeight = 2.0 * std::tan(verticalFovRadians / 2.0) * focalLength;
         this->imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));
         this->pixelsPerSample = 1.0 / static_cast<double>(samplesPerPixel);
-        this->cameraPosition = Point3(0.0, 0.0, 0.0);
         
         const double viewPortWidth = viewPortHeight * (static_cast<double>(imageWidth) / static_cast<double>(imageHeight));
+
+        w = (eyePosition - lookAtPosition).normalized();
+        u = Vec3::cross(up, w).normalized();
+        v = Vec3::cross(w, u);
     
-        const Vec3 viewportU = Vec3(viewPortWidth, 0.0, 0.0);
-        const Vec3 viewportV = Vec3(0.0, -viewPortHeight, 0.0);
+        const Vec3 viewportU = viewPortWidth * u;
+        const Vec3 viewportV = viewPortHeight * -v;
     
         this->du = viewportU / static_cast<double>(imageWidth);
         this->dv = viewportV / static_cast<double>(imageHeight);
     
-        const Point3 viewportUpperLeft = cameraPosition - Vec3(0.0, 0.0, focalLength) - viewportU / 2.0 - viewportV / 2.0;
+        const Point3 viewportUpperLeft = eyePosition - (focalLength * w) - viewportU / 2.0 - viewportV / 2.0;
         this->pixel00Position = viewportUpperLeft + 0.5 * (du + dv);
     }
 
@@ -91,7 +103,7 @@ private:
         const Point3 offset = sampleSquare();
         const Point3 samplePosition = pixel00Position + ((static_cast<double>(x) + offset.x()) * du) + ((static_cast<double>(y) + offset.y())  * dv);
     
-        return Ray(this->cameraPosition, samplePosition - this->cameraPosition);
+        return Ray(this->eyePosition, samplePosition - this->eyePosition);
     }
 
     Point3 sampleSquare() const {
