@@ -18,12 +18,14 @@ int main() {
     Scene world;
     auto groundMaterial = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
     auto centerMaterial = std::make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
-    auto leftMaterial   = std::make_shared<Dielectric>(1.0 / 1.33);
+    auto leftMaterial   = std::make_shared<Dielectric>(1.5);
+    auto bubbleMaterial = std::make_shared<Dielectric>(1.0 / 1.5);
     auto rightMaterial  = std::make_shared<Metal>(Color(0.8, 0.6, 0.2), 1.0);
 
     world.add(std::make_shared<Sphere>(Point3( 0.0, -100.5, -1.0), 100.0, groundMaterial));
     world.add(std::make_shared<Sphere>(Point3( 0.0,    0.0, -1.2),   0.5, centerMaterial));
     world.add(std::make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),   0.5, leftMaterial));
+    world.add(std::make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),   0.4, bubbleMaterial));
     world.add(std::make_shared<Sphere>(Point3( 1.0,    0.0, -1.0),   0.5, rightMaterial));
 
     camera.render(world);

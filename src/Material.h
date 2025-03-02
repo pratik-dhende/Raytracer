@@ -56,7 +56,7 @@ class Dielectric : public Material {
         Dielectric(const double refractiveIndex) : refractiveIndex(refractiveIndex) {}
 
         bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const override {
-            double etaSurroundingOverEtaMaterial = hitInfo.getFront() ? (1.0 / this->refractiveIndex) : this->refractiveIndex;
+            double refractiveIndexReciprocal = hitInfo.getFront() ? (1.0 / this->refractiveIndex) : this->refractiveIndex;
 
             auto unitRayInDirection = rayIn.direction().normalized();
 
@@ -64,11 +64,11 @@ class Dielectric : public Material {
             double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
             
             Vec3 scatteringDirection;
-            if (etaSurroundingOverEtaMaterial * sinTheta > 1.0) {
+            if (refractiveIndexReciprocal * sinTheta > 1.0 || reflectance(cosTheta, refractiveIndexReciprocal) > random()) {
                 scatteringDirection = Vec3::reflect(unitRayInDirection, hitInfo.getNormal());
             }
             else {
-                scatteringDirection = Vec3::refract(unitRayInDirection, hitInfo.getNormal(), etaSurroundingOverEtaMaterial);
+                scatteringDirection = Vec3::refract(unitRayInDirection, hitInfo.getNormal(), refractiveIndexReciprocal);
             }
 
             scatteredRay = Ray(hitInfo.p, scatteringDirection);
@@ -78,4 +78,10 @@ class Dielectric : public Material {
 
     private:
         double refractiveIndex;
+
+        static double reflectance(const double cosine, const double refractiveIndexReciprocal) {
+            double r0 = (1 - refractiveIndexReciprocal) / (1 + refractiveIndexReciprocal);
+            r0 = r0 * r0;
+            return r0 + (1.0 - r0) * std::pow((1.0 - cosine), 5.0);
+        }
 };

@@ -155,9 +155,9 @@ public:
         return v - 2.0 * dot(v, normal) * normal;
     }
 
-    static Vec3 refract(const Vec3& v, const Vec3& normal, const double etaSurroundingOverEtaMaterial) {
+    static Vec3 refract(const Vec3& v, const Vec3& normal, const double refractiveIndexReciprocal) {
         auto cosTheta = std::min(dot(-v, normal), 1.0);
-        const Vec3 vOutPerpendicular = etaSurroundingOverEtaMaterial * (v + cosTheta * normal);
+        const Vec3 vOutPerpendicular = refractiveIndexReciprocal * (v + cosTheta * normal);
         // TODO: Why use abs?
         const Vec3 vOutParallel = -std::sqrt(std::abs(1.0 - vOutPerpendicular.magnitudeSquared())) * normal;
         return vOutPerpendicular + vOutParallel;
