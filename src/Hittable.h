@@ -22,6 +22,10 @@ public:
         return normal;
     }
 
+    bool getFront() const {
+        return front;
+    }
+
 private:
     Vec3 normal;
     bool front;

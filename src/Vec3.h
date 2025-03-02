@@ -143,14 +143,24 @@ public:
 
     static Vec3 randomUnitHemisphere(const Vec3& normal) {
         Vec3 unitSphereVector = randomUnitVector();
-        if (Vec3::dot(unitSphereVector, normal) > 0.0)
+        if (Vec3::dot(unitSphereVector, normal) > 0.0) {
             return unitSphereVector;
-        else
+        }
+        else {
             return -unitSphereVector;
+        }
     }
 
     static Vec3 reflect(const Vec3& v, const Vec3& normal) {
         return v - 2.0 * dot(v, normal) * normal;
+    }
+
+    static Vec3 refract(const Vec3& v, const Vec3& normal, const double etaSurroundingOverEtaMaterial) {
+        auto cosTheta = std::min(dot(-v, normal), 1.0);
+        const Vec3 vOutPerpendicular = etaSurroundingOverEtaMaterial * (v + cosTheta * normal);
+        // TODO: Why use abs?
+        const Vec3 vOutParallel = -std::sqrt(std::abs(1.0 - vOutPerpendicular.magnitudeSquared())) * normal;
+        return vOutPerpendicular + vOutParallel;
     }
 
     static double dot(const Vec3& v1, const Vec3& v2) {
