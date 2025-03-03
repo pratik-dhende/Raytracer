@@ -140,8 +140,17 @@ public:
             }
         }
     }
+    
+    static Vec3 randomVectorInUnitCircle() {
+        while(true) {
+            auto v = Vec3(::random(-1.0, 1.0), ::random(-1.0, 1.0), 0.0);
+            if (v.magnitude() < 1.0) {
+                return v;
+            }
+        }
+    }
 
-    static Vec3 randomUnitHemisphere(const Vec3& normal) {
+    static Vec3 randomUnitVectorInHemisphere(const Vec3& normal) {
         Vec3 unitSphereVector = randomUnitVector();
         if (Vec3::dot(unitSphereVector, normal) > 0.0) {
             return unitSphereVector;
@@ -150,6 +159,7 @@ public:
             return -unitSphereVector;
         }
     }
+
 
     static Vec3 reflect(const Vec3& v, const Vec3& normal) {
         return v - 2.0 * dot(v, normal) * normal;

@@ -17,6 +17,9 @@ public:
     Point3 lookAtPosition = Point3(0.0, 0.0, -1.0);
     Vec3 up = Point3(0.0, 1.0, 0.0);
 
+    double defocusAngle = 0.0;
+    double focusDistance = 10.0;
+
 public:
     void render(const Hittable& world)  {
         init();
@@ -52,11 +55,13 @@ private:
     Vec3 v;
     Vec3 w;
 
+    Vec3 defocusDiskU;
+    Vec3 defocusDiskV;
+
     void init() {
-        const double focalLength = (lookAtPosition - eyePosition).magnitude();
         const double verticalFovRadians = degreesToRadians(vertifcalFov);
         
-        const double viewPortHeight = 2.0 * std::tan(verticalFovRadians / 2.0) * focalLength;
+        const double viewPortHeight = 2.0 * std::tan(verticalFovRadians / 2.0) * focusDistance;
         this->imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));
         this->pixelsPerSample = 1.0 / static_cast<double>(samplesPerPixel);
         
@@ -72,8 +77,12 @@ private:
         this->du = viewportU / static_cast<double>(imageWidth);
         this->dv = viewportV / static_cast<double>(imageHeight);
     
-        const Point3 viewportUpperLeft = eyePosition - (focalLength * w) - viewportU / 2.0 - viewportV / 2.0;
+        const Point3 viewportUpperLeft = eyePosition - (focusDistance * w) - viewportU / 2.0 - viewportV / 2.0;
         this->pixel00Position = viewportUpperLeft + 0.5 * (du + dv);
+
+        double defocusRadius = focusDistance * std::tan(degreesToRadians(defocusAngle / 2.0));
+        defocusDiskU = defocusRadius * u;
+        defocusDiskV = defocusRadius * v;
     }
 
     Color rayColor(const Ray& ray, const Hittable& world, int depth) const {
@@ -102,11 +111,17 @@ private:
     Ray sampleRay(const int x, const int y) const {
         const Point3 offset = sampleSquare();
         const Point3 samplePosition = pixel00Position + ((static_cast<double>(x) + offset.x()) * du) + ((static_cast<double>(y) + offset.y())  * dv);
-    
-        return Ray(this->eyePosition, samplePosition - this->eyePosition);
+        
+        auto rayOrigin = defocusAngle <= 0.0 ? this->eyePosition : sampleDefocusDisk();
+        return Ray(rayOrigin, samplePosition - rayOrigin);
     }
 
     Point3 sampleSquare() const {
         return Point3(random() - 0.5, random() - 0.5, 0.0);
+    }
+
+    Point3 sampleDefocusDisk() const {
+        auto p = Vec3::randomVectorInUnitCircle();
+        return this->eyePosition + (p.x() * this->defocusDiskU) + (p.y() * this->defocusDiskV);
     }
 };
