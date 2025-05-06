@@ -99,7 +99,8 @@ public:
         return *this;
     }
 
-    __host__ __device__ Vec3& operator*=(const int scalar) {
+    template<typename T>
+    __host__ __device__ Vec3& operator*=(const T scalar) {
         m_x *= scalar;
         m_y *= scalar;
         m_z *= scalar;
