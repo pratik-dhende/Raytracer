@@ -183,7 +183,6 @@ int main() {
 
     // Allocate framebuffer on device
     int framebufferSize = camera.imageWidth * camera.getFrameBufferHeight();
-    // std::clog << camera.imageWidth <<  " * " <<  camera.getFrameBufferHeight() << " = " << framebufferSize << " <- Framebuffer size\n";
     Cuda::SmartPointer<Vec3> d_frameBuffer(framebufferSize, true);
 
     // Compute dimensions for render
