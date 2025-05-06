@@ -99,11 +99,17 @@ public:
         return *this;
     }
 
-    template<typename T>
-    __host__ __device__ Vec3& operator*=(const T scalar) {
+    __host__ __device__ Vec3& operator*=(const double scalar) {
         m_x *= scalar;
         m_y *= scalar;
         m_z *= scalar;
+        return *this;
+    }
+
+    __host__ __device__ Vec3& operator*=(const Vec3& other) {
+        m_x *= other.x();
+        m_y *= other.y();
+        m_z *= other.z();
         return *this;
     }
     

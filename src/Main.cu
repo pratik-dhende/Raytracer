@@ -11,26 +11,34 @@
 namespace Cuda {
     __device__
     Color rayColor(const Ray& ray, const Hittable& world, int depth, curandState& randState) {
-        if (depth == 0) {
-            return Color(0.0);
-        }
+        Color pixelColor(1.0);
+        Ray incidentRay = ray;
 
+        Color attenuation;
+        Ray scatteredRay;
         HitInfo hitInfo;
 
-        if (world.hit(ray, Interval(0.001, POSITIVE_INFINITY), hitInfo)) {
-            Color attenuation;
-            Ray scatteredRay;
-
-            if (hitInfo.material->scatter(ray, hitInfo, attenuation, scatteredRay, randState)) {
-                return attenuation * rayColor(scatteredRay, world, depth - 1, randState);
+        while(depth > 0) {
+            if(world.hit(incidentRay, Interval(0.001, POSITIVE_INFINITY), hitInfo)) {
+                if (hitInfo.material->scatter(incidentRay, hitInfo, attenuation, scatteredRay, randState)) {
+                    pixelColor *= attenuation;
+                    incidentRay = scatteredRay;
+                }
+                else {
+                    pixelColor = Color(0.0);
+                    break;
+                }
             }
-
-            return Color(0.0);
+            else {
+                Vec3 unitDirection = incidentRay.direction().normalized();
+                auto a = 0.5 * (unitDirection.y() + 1.0);
+                pixelColor *= (1.0 - a) * Color(1.0) + a * Color(0.5, 0.7, 1.0);
+                break;
+            }
+            --depth;
         }
-        
-        Vec3 unitDirection = ray.direction().normalized();
-        auto a = 0.5 * (unitDirection.y() + 1.0);
-        return (1.0 - a) * Color(1.0) + a * Color(0.5, 0.7, 1.0);
+
+        return depth ? pixelColor : Color(0.0);
     }
 
     __global__
@@ -162,8 +170,8 @@ int main() {
 
     camera.aspectRatio = 16.0 / 9.0;
     camera.imageWidth = 1200;
-    camera.samplesPerPixel = 10;
-    camera.maxDepth = 10;
+    camera.samplesPerPixel = 500;
+    camera.maxDepth = 50;
 
     camera.vertifcalFov = 20.0;
     camera.eyePosition = Point3(13.0, 2.0, 3.0);
