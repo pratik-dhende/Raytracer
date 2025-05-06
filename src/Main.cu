@@ -45,20 +45,20 @@ namespace Cuda {
         int pixelIndex = i * d_camera->imageWidth + j;
 
         curandState localRandState = randState[pixelIndex];
-        Color pixelColor = Color(1.0);
+        Color pixelColor = Color(0.0);
 
-        // for(int sample = 0; sample < d_camera->samplesPerPixel; ++sample) {
-        //     pixelColor += rayColor(d_camera->sampleRay(j, i, localRandState), **d_world, d_camera->maxDepth, localRandState);
-        // }
-        // pixelColor *= d_camera->getPixelsPerSample();
-
+        for(int sample = 0; sample < d_camera->samplesPerPixel; ++sample) {
+            pixelColor += rayColor(d_camera->sampleRay(j, i, localRandState), **d_world, d_camera->maxDepth, localRandState);
+        }
+        pixelColor *= d_camera->getPixelsPerSample();
+        
         randState[pixelIndex] = localRandState;
         
         d_framebuffer[pixelIndex] = pixelColor;
     }
 
     __global__
-    void initCurandState(curandState* d_randState, Camera* d_camera) {
+    void initPixelCurandState(curandState* d_randState, Camera* d_camera) {
         int j = blockIdx.x * blockDim.x + threadIdx.x;
         int i = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -70,12 +70,20 @@ namespace Cuda {
         curand_init(1984 + pixelIndex, 0, 0, &d_randState[pixelIndex]);
     }
 
-    __global__ 
-    void createScene(Scene** d_world, curandState* d_randState) {
-        if (blockDim.x > 0 || gridDim.x > 0) {
+    __global__
+    void initSceneCurandState(curandState* d_randState) {
+        if (threadIdx.x != 0 || blockIdx.x != 0) {
             return;
         }
-    
+        curand_init(1984, 0, 0, d_randState);
+    }
+
+    __global__ 
+    void createScene(Scene** d_world, curandState* d_randState) {
+        if (threadIdx.x != 0 || blockIdx.x != 0) {
+            return;
+        }
+
         *d_world = new Scene(22 * 22 + 3);
         Scene* world = *d_world;
 
@@ -135,9 +143,16 @@ namespace Cuda {
 }
 
 int main() {
+    cudaDeviceSetLimit(cudaLimitStackSize, 16384);
+
     // Create a scene in device memory
     Cuda::SmartPointer<Scene*> d_world(1, false);
     Cuda::SmartPointer<curandState> d_sceneRandState(1, false);
+
+    Cuda::initSceneCurandState<<<1, 1>>>(d_sceneRandState.get());
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
     Cuda::createScene<<<1, 1>>>(d_world.get(), d_sceneRandState.get());
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
@@ -148,7 +163,7 @@ int main() {
     camera.aspectRatio = 16.0 / 9.0;
     camera.imageWidth = 1200;
     camera.samplesPerPixel = 1;
-    camera.maxDepth = 50;
+    camera.maxDepth = 10;
 
     camera.vertifcalFov = 20.0;
     camera.eyePosition = Point3(13.0, 2.0, 3.0);
@@ -159,6 +174,8 @@ int main() {
     camera.focusDistance = 10.0;
 
     camera.init();
+
+    std::clog << "Width: " << camera.imageWidth << " Height: " << camera.getFrameBufferHeight() << " Total: " << camera.imageWidth * camera.getFrameBufferHeight() << "\n";
 
     // Allocate and initialize camera on device
     Cuda::SmartPointer<Camera> d_camera(1, false);
@@ -177,9 +194,11 @@ int main() {
 
     // Allocate and initialize pixel random states on device
     Cuda::SmartPointer<curandState> d_pixelRandStates(framebufferSize, false);
-    Cuda::initCurandState<<<gridDimensions, blockDimensions>>>(d_pixelRandStates.get(), d_camera.get());
+    Cuda::initPixelCurandState<<<gridDimensions, blockDimensions>>>(d_pixelRandStates.get(), d_camera.get());
     checkCudaErrors(cudaGetLastError());
     checkCudaErrors(cudaDeviceSynchronize());
+
+    std::clog << "Grid Dimensions: (" << gridDimensions.x << ", " << gridDimensions.y << ") " << "Block Dimensions: (" << blockDimensions.x << ", " << blockDimensions.y << ")\n";
 
     // Render
     Cuda::render<<<gridDimensions, blockDimensions>>>(d_world.get(), d_frameBuffer.get(), d_camera.get(), d_pixelRandStates.get());

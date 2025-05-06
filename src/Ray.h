@@ -14,7 +14,7 @@ public:
     __device__ const Vec3& direction() const noexcept { return m_direction; }
 
     __device__ Point3 at(double t) const noexcept {
-        return m_origin + t * m_direction;
+        return m_origin + m_direction * t;
     }
 
 private:

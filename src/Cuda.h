@@ -54,11 +54,11 @@ namespace Cuda{
         T* pointer;
     };
 
-    __device__ static inline double random(curandState& randState) {;
+    __device__ inline double random(curandState& randState) {
         return curand_uniform(&randState);
     }
     
-    __device__ static inline double random(double min, double max, curandState& randState) {
+    __device__ inline double random(double min, double max, curandState& randState) {
         return min + (max - min) * random(randState);
     }
 
