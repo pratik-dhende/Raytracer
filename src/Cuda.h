@@ -7,6 +7,9 @@ namespace Cuda{
     template<typename T>
     class SmartPointer {
     public:
+        SmartPointer(const SmartPointer& other) = delete;
+        SmartPointer& operator=(const SmartPointer& other) = delete;
+
         SmartPointer() : pointer(nullptr) {
 
         }
@@ -16,6 +19,10 @@ namespace Cuda{
         }
 
         void alloc(int count, bool onHost) {
+            if (pointer) {
+                return;
+            }
+
             if (onHost) {
                 checkCudaErrors(cudaMallocManaged(reinterpret_cast<void**>(&pointer), sizeof(T) * count));
             }
@@ -27,11 +34,12 @@ namespace Cuda{
         ~SmartPointer() {
             if (pointer) {
                 checkCudaErrors(cudaFree(pointer));
+                pointer = nullptr;
             }
         }
 
-        T operator->() {
-            return *pointer;
+        T* operator->() {
+            return pointer;
         }
 
         T& operator[](int i) {

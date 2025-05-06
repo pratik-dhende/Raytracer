@@ -35,37 +35,39 @@ namespace Cuda {
 
     __global__
     void render(Scene** d_world, Vec3* d_framebuffer, Camera* d_camera, curandState *randState) {
-        int i = blockIdx.x * blockDim.x + threadIdx.x;
-        int j = blockIdx.y * blockDim.y + threadIdx.y;
+        int j = blockIdx.x * blockDim.x + threadIdx.x;
+        int i = blockIdx.y * blockDim.y + threadIdx.y;
 
-        if (i >= d_camera->imageWidth || j >= d_camera->getFrameBufferHeight()) {
+        if (j >= d_camera->imageWidth || i >= d_camera->getFrameBufferHeight()) {
             return;
         }
         
         int pixelIndex = i * d_camera->imageWidth + j;
 
         curandState localRandState = randState[pixelIndex];
-        Color pixelColor = Color(0.0);
+        Color pixelColor = Color(1.0);
 
-        for(int sample = 0; sample < d_camera->samplesPerPixel; ++sample) {
-            pixelColor += rayColor(d_camera->sampleRay(j, i, localRandState), **d_world, d_camera->maxDepth, localRandState);
-        }
-        pixelColor *= d_camera->getPixelsPerSample();
+        // for(int sample = 0; sample < d_camera->samplesPerPixel; ++sample) {
+        //     pixelColor += rayColor(d_camera->sampleRay(j, i, localRandState), **d_world, d_camera->maxDepth, localRandState);
+        // }
+        // pixelColor *= d_camera->getPixelsPerSample();
+
+        randState[pixelIndex] = localRandState;
         
         d_framebuffer[pixelIndex] = pixelColor;
     }
 
     __global__
     void initCurandState(curandState* d_randState, Camera* d_camera) {
-        int i = blockIdx.x * blockDim.x + threadIdx.x;
-        int j = blockIdx.y * blockDim.y + threadIdx.y;
+        int j = blockIdx.x * blockDim.x + threadIdx.x;
+        int i = blockIdx.y * blockDim.y + threadIdx.y;
 
-        if (i >= d_camera->imageWidth || j >= d_camera->getFrameBufferHeight()) {
+        if (j >= d_camera->imageWidth || i >= d_camera->getFrameBufferHeight()) {
             return;
         }
         
         int pixelIndex = i * d_camera->imageWidth + j;
-        curand_init(1984, pixelIndex, 0, &d_randState[pixelIndex]);
+        curand_init(1984 + pixelIndex, 0, 0, &d_randState[pixelIndex]);
     }
 
     __global__ 
@@ -164,6 +166,7 @@ int main() {
 
     // Allocate framebuffer on device
     int framebufferSize = camera.imageWidth * camera.getFrameBufferHeight();
+    // std::clog << camera.imageWidth <<  " * " <<  camera.getFrameBufferHeight() << " = " << framebufferSize << " <- Framebuffer size\n";
     Cuda::SmartPointer<Vec3> d_frameBuffer(framebufferSize, true);
 
     // Compute dimensions for render
@@ -191,10 +194,6 @@ int main() {
 
     // Free device memory
     Cuda::deleteScene<<<1, 1>>>(d_world.get());
-    checkCudaErrors(cudaGetLastError());
-    checkCudaErrors(cudaDeviceSynchronize());
-
-    cudaDeviceReset();
 
     return 0;
 }
