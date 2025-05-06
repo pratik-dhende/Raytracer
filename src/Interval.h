@@ -1,29 +1,30 @@
 #pragma once
 
 #include "Utility.h"
+#include "Cuda.h"
 
 class Interval {
   public:
     double min, max;
 
-    Interval() : min(POSITIVE_INFINITY), max(-POSITIVE_INFINITY) {} // Default interval is empty
+    __host__ __device__ Interval() : min(POSITIVE_INFINITY), max(-POSITIVE_INFINITY) {} // Default interval is empty
 
-    constexpr Interval(const double _min, const double _max) : min(_min), max(_max) {}
+    __host__ __device__ Interval(const double _min, const double _max) : min(_min), max(_max) {}
 
-    double size() const {
+    __host__ __device__ double size() const {
         return max - min;
     }
 
-    bool contains(const double x) const {
+    __host__ __device__ bool contains(const double x) const {
         return min <= x && x <= max;
     }
 
-    bool surrounds(const double x) const {
+    __host__ __device__ bool surrounds(const double x) const {
         return min < x && x < max;
     }
 
-    double clamp(const double x) const {
-        return std::max(this->min, std::min(x, this->max));
+    __host__ __device__ double clamp(const double x) const {
+        return Cuda::max(this->min, Cuda::min(x, this->max));
     }
 
     static const Interval EMPTY, UNIVERSE;

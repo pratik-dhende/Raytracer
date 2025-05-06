@@ -12,4 +12,3 @@
 #include <cmath>
 #include <limits>
 #include <random>
-

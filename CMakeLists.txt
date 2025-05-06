@@ -21,14 +21,14 @@ endif()
 find_package(CUDAToolkit REQUIRED)
 
 # Main target
-add_executable(Raytracer src/Main.cu src/Vec3.cpp)
-target_include_directories(Raytracer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_executable(Raytracer src/Main.cu)
+# target_include_directories(Raytracer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Compiler options
 option(DEBUG_MODE "Debug mode" ON)
 target_compile_options(Raytracer PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:
-        $<$<BOOL:${DEBUG_MODE}>:-g;-G;-lineinfo>
+        $<$<BOOL:${DEBUG_MODE}>:-g;-G>
         $<$<NOT:$<BOOL:${DEBUG_MODE}>>:-O3;--use_fast_math>
     >
     $<$<COMPILE_LANGUAGE:CXX>:

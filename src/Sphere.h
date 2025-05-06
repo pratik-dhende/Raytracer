@@ -8,11 +8,11 @@
 
 class Sphere : public Hittable {
     public:
-        Sphere(const Point3& _center, const double _radius, const std::shared_ptr<Material> material) : center(_center), radius(std::max(0.0, _radius)), material(material) {
+        __device__ Sphere(const Point3& _center, const double _radius, Material* material) : center(_center), radius(Cuda::max(0.0, _radius)), material(material) {
 
         }
 
-        bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
+        __device__ bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
             Vec3 centerRayOrigin = center - ray.origin();
 
             double a = ray.direction().magnitudeSquared();
@@ -24,7 +24,7 @@ class Sphere : public Hittable {
             if (discriminant < 0.0)
                 return false;
             
-            double sqrtDiscriminant = std::sqrt(discriminant);
+            double sqrtDiscriminant = sqrt(discriminant);
             double t1 = (h - sqrtDiscriminant) / a;
             double t2 = (h + sqrtDiscriminant) / a;
 
@@ -43,5 +43,6 @@ class Sphere : public Hittable {
     private:
         Point3 center;
         double radius;
-        std::shared_ptr<Material> material;
+
+        Material* material;
 };

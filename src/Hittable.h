@@ -9,20 +9,21 @@ class HitInfo {
 public:
     Point3 p;
     double t ;
-    std::shared_ptr<Material> material;
 
-    HitInfo() : p(0.0), normal(0.0), t(-1.0), front(false) {}
+    Material* material;
 
-    void setNormal(const Ray& ray, const Vec3& unitNormal) {
+    __device__ HitInfo() : p(0.0), normal(0.0), t(-1.0), front(false) {}
+
+    __device__ void setNormal(const Ray& ray, const Vec3& unitNormal) {
         this->front = Vec3::dot(ray.direction(), unitNormal) < 0.0;
         this->normal = this->front ? unitNormal : -unitNormal;
     }
 
-    Vec3 getNormal() const {
+    __device__ Vec3 getNormal() const {
         return normal;
     }
 
-    bool getFront() const {
+    __device__ bool getFront() const {
         return front;
     }
 
@@ -33,7 +34,7 @@ private:
 
 class Hittable {
     public:
-        virtual ~Hittable() = default;
+        __device__ virtual ~Hittable() {};
 
-        virtual bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const = 0;
+        __device__ virtual bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const = 0;
 };

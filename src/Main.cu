@@ -4,54 +4,143 @@
 #include "Sphere.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Cuda.h"
 
 #include <iostream>
 
-int main() {
-    Scene world;
+namespace Cuda {
+    __device__
+    Color rayColor(const Ray& ray, const Hittable& world, int depth, curandState& randState) {
+        if (depth == 0) {
+            return Color(0.0);
+        }
 
-    auto groundMaterial = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
-    world.add(std::make_shared<Sphere>(Point3(0.0 ,-1000.0 ,0.0), 1000.0, groundMaterial));
+        HitInfo hitInfo;
 
-    for (int a = -11; a < 11; ++a) {
-        for (int b = -11; b < 11; ++b) {
-            auto chosenMaterial = random();
-            Point3 center(a + 0.9 * random(), 0.2, b + 0.9 * random());
+        if (world.hit(ray, Interval(0.001, POSITIVE_INFINITY), hitInfo)) {
+            Color attenuation;
+            Ray scatteredRay;
 
-            if ((center - Point3(4.0, 0.2, 0.0)).magnitude() > 0.9) {
-                std::shared_ptr<Material> sphereMaterial;
+            if (hitInfo.material->scatter(ray, hitInfo, attenuation, scatteredRay, randState)) {
+                return attenuation * rayColor(scatteredRay, world, depth - 1, randState);
+            }
 
-                if (chosenMaterial < 0.8) {
-                    // Diffuse
-                    auto albedo = Color::random() * Color::random();
-                    sphereMaterial = std::make_shared<Lambertian>(albedo);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
-                } 
-                else if (chosenMaterial < 0.95) {
-                    // Metal
-                    auto albedo = Color::random(0.5, 1);
-                    auto fuzz = random(0, 0.5);
-                    sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
-                } 
-                else {
-                    // Glass
-                    sphereMaterial = std::make_shared<Dielectric>(1.5);
-                    world.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+            return Color(0.0);
+        }
+        
+        Vec3 unitDirection = ray.direction().normalized();
+        auto a = 0.5 * (unitDirection.y() + 1.0);
+        return (1.0 - a) * Color(1.0) + a * Color(0.5, 0.7, 1.0);
+    }
+
+    __global__
+    void render(Scene** d_world, Vec3* d_framebuffer, Camera* d_camera, curandState *randState) {
+        int i = blockIdx.x * blockDim.x + threadIdx.x;
+        int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+        if (i >= d_camera->imageWidth || j >= d_camera->getFrameBufferHeight()) {
+            return;
+        }
+        
+        int pixelIndex = i * d_camera->imageWidth + j;
+
+        curandState localRandState = randState[pixelIndex];
+        Color pixelColor = Color(0.0);
+
+        for(int sample = 0; sample < d_camera->samplesPerPixel; ++sample) {
+            pixelColor += rayColor(d_camera->sampleRay(j, i, localRandState), **d_world, d_camera->maxDepth, localRandState);
+        }
+        pixelColor *= d_camera->getPixelsPerSample();
+        
+        d_framebuffer[pixelIndex] = pixelColor;
+    }
+
+    __global__
+    void initCurandState(curandState* d_randState, Camera* d_camera) {
+        int i = blockIdx.x * blockDim.x + threadIdx.x;
+        int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+        if (i >= d_camera->imageWidth || j >= d_camera->getFrameBufferHeight()) {
+            return;
+        }
+        
+        int pixelIndex = i * d_camera->imageWidth + j;
+        curand_init(1984, pixelIndex, 0, &d_randState[pixelIndex]);
+    }
+
+    __global__ 
+    void createScene(Scene** d_world, curandState* d_randState) {
+        if (blockDim.x > 0 || gridDim.x > 0) {
+            return;
+        }
+    
+        *d_world = new Scene(22 * 22 + 3);
+        Scene* world = *d_world;
+
+        curandState localRandState = *d_randState;
+    
+        auto groundMaterial = new Lambertian(Color(0.5, 0.5, 0.5));
+        world->add(new Sphere(Point3(0.0 ,-1000.0 ,0.0), 1000.0, groundMaterial));
+    
+        for (int a = -11; a < 11; ++a) {
+            for (int b = -11; b < 11; ++b) {
+                auto chosenMaterial = Cuda::random(localRandState);
+                Point3 center(a + 0.9 * Cuda::random(localRandState), 0.2, b + 0.9 * Cuda::random(localRandState));
+    
+                if ((center - Point3(4.0, 0.2, 0.0)).magnitude() > 0.9) {
+                    Material* sphereMaterial;
+    
+                    if (chosenMaterial < 0.8) {
+                        // Diffuse
+                        auto albedo = Color::random(localRandState) * Color::random(localRandState);
+                        sphereMaterial = new Lambertian(albedo);
+                        world->add(new Sphere(center, 0.2, sphereMaterial));
+                    } 
+                    else if (chosenMaterial < 0.95) {
+                        // Metal
+                        auto albedo = Color::random(0.5, 1, localRandState);
+                        auto fuzz = Cuda::random(0, 0.5, localRandState);
+                        sphereMaterial = new Metal(albedo, fuzz);
+                        world->add(new Sphere(center, 0.2, sphereMaterial));
+                    } 
+                    else {
+                        // Glass
+                        sphereMaterial = new Dielectric(1.5);
+                        world->add(new Sphere(center, 0.2, sphereMaterial));
+                    }
                 }
             }
         }
+    
+        auto material1 = new Dielectric(1.5);
+        world->add(new Sphere(Point3(0.0, 1.0, 0.0), 1.0, material1));
+    
+        auto material2 = new Lambertian(Color(0.4, 0.2, 0.1));
+        world->add(new Sphere(Point3(-4.0, 1.0, 0.0), 1.0, material2));
+    
+        auto material3 = new Metal(Color(0.7, 0.6, 0.5), 0.0);
+        world->add(new Sphere(Point3(4.0, 1.0, 0.0), 1.0, material3));
+
+        *d_randState = localRandState;
     }
 
-    auto material1 = std::make_shared<Dielectric>(1.5);
-    world.add(std::make_shared<Sphere>(Point3(0.0, 1.0, 0.0), 1.0, material1));
+    __global__
+    void deleteScene(Scene** d_world) {
+        if (*d_world) {
+            delete *d_world;
+        }
+    }
+}
 
-    auto material2 = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
-    world.add(std::make_shared<Sphere>(Point3(-4.0, 1.0, 0.0), 1.0, material2));
+int main() {
+    // Create a scene in device memory
+    Cuda::SmartPointer<Scene*> d_world(1, false);
+    Cuda::SmartPointer<curandState> d_sceneRandState(1, false);
+    Cuda::createScene<<<1, 1>>>(d_world.get(), d_sceneRandState.get());
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
 
-    auto material3 = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
-    world.add(std::make_shared<Sphere>(Point3(4.0, 1.0, 0.0), 1.0, material3));
-    
+    // Init camera parameters
     Camera camera;
 
     camera.aspectRatio = 16.0 / 9.0;
@@ -67,7 +156,45 @@ int main() {
     camera.defocusAngle = 0.6;
     camera.focusDistance = 10.0;
 
-    camera.render(world);
+    camera.init();
+
+    // Allocate and initialize camera on device
+    Cuda::SmartPointer<Camera> d_camera(1, false);
+    cudaMemcpy(d_camera.get(), &camera, sizeof(Camera), cudaMemcpyHostToDevice);
+
+    // Allocate framebuffer on device
+    int framebufferSize = camera.imageWidth * camera.getFrameBufferHeight();
+    Cuda::SmartPointer<Vec3> d_frameBuffer(framebufferSize, true);
+
+    // Compute dimensions for render
+    int threadsX = 8;
+    int threadsY = 8;
+    dim3 blockDimensions(threadsX, threadsY);
+    dim3 gridDimensions((camera.imageWidth + threadsX - 1) / threadsX, (camera.getFrameBufferHeight() + threadsY - 1) / threadsY);
+
+    // Allocate and initialize pixel random states on device
+    Cuda::SmartPointer<curandState> d_pixelRandStates(framebufferSize, false);
+    Cuda::initCurandState<<<gridDimensions, blockDimensions>>>(d_pixelRandStates.get(), d_camera.get());
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    // Render
+    Cuda::render<<<gridDimensions, blockDimensions>>>(d_world.get(), d_frameBuffer.get(), d_camera.get(), d_pixelRandStates.get());
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    // Write output
+    std::cout << "P3\n" << camera.imageWidth << " " << camera.getFrameBufferHeight() << "\n255\n";
+    for(int i = 0; i < framebufferSize; i++) {
+        write_color(std::cout, d_frameBuffer[i]);
+    }
+
+    // Free device memory
+    Cuda::deleteScene<<<1, 1>>>(d_world.get());
+    checkCudaErrors(cudaGetLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
+
+    cudaDeviceReset();
 
     return 0;
 }

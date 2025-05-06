@@ -24,7 +24,7 @@ void write_color(std::ostream& out, const Color& pixel_color) {
     b = linearToGamma(b);
 
     // Translate the [0,1] component values to the byte range [0,255].
-    constexpr Interval interval(0.0, 0.999);
+    Interval interval(0.0, 0.999);
 
     int rByte = static_cast<int>(256 * interval.clamp(r));
     int gByte = static_cast<int>(256 * interval.clamp(g));

@@ -5,32 +5,27 @@
 
 #include <vector>
 #include <memory>
+#include <cassert>
 
 class Scene : public Hittable {
 public:
-    Scene() {
-
+    __device__ Scene(const int size) : freeIndex(0), size(size){
+        hittables = new Hittable*[size];
     }
 
-    Scene(const std::shared_ptr<Hittable>& hittable) {
-        add(hittable);
+    __device__ void add(Hittable* hittable) {
+        assert(freeIndex < size);
+
+        hittables[freeIndex++] = hittable;
     }
 
-    void clear() {
-        hittables.clear();
-    }
-
-    void add(const std::shared_ptr<Hittable>& hittable) {
-        hittables.emplace_back(hittable);
-    }
-
-    bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
+    __device__ bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
         double closestT = rayTInterval.max;
         HitInfo tempHitInfo;
         bool anyHit = false;
 
-        for(const auto& hittable : hittables) {
-            if (hittable->hit(ray, Interval(rayTInterval.min, closestT), tempHitInfo)) {
+        for(int i = 0; i < freeIndex; ++i) {
+            if (hittables[i]->hit(ray, Interval(rayTInterval.min, closestT), tempHitInfo)) {
                 closestT = tempHitInfo.t;
                 hitInfo = tempHitInfo;
                 anyHit = true;
@@ -40,6 +35,12 @@ public:
         return anyHit;
     }
 
+    __device__ ~Scene() {
+        delete[] hittables;
+    }
+
 private:
-    std::vector<std::shared_ptr<Hittable>> hittables;
+    Hittable** hittables;
+    int freeIndex;
+    int size;
 };
