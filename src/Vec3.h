@@ -242,7 +242,7 @@ __host__ __device__ Vec3 Vec3::reflect(const Vec3& v, const Vec3& normal) {
 __host__ __device__ Vec3 Vec3::refract(const Vec3& v, const Vec3& normal, const double refractiveIndexReciprocal) {
     auto cosTheta = Cuda::min(dot(-v, normal), 1.0);
     const Vec3 vOutPerpendicular = refractiveIndexReciprocal * (v + cosTheta * normal);
-    // TODO: Why use abs?
+    // TODO: Why use abs instead of clamping to 0.0?
     const Vec3 vOutParallel = -sqrt(abs(1.0 - vOutPerpendicular.magnitudeSquared())) * normal;
     return vOutPerpendicular + vOutParallel;
 }
