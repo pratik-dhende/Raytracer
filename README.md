@@ -19,10 +19,11 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
 - Global illumination - Recursive Ray Tracing with Bounce Limit
 
 ## Render Output
-- The image below was rendered at a resolution of 1200 × 675 with 500 samples per pixel and a maximum ray bounce limit of 50.
-- This results in a total of 20.25 billion rays traced.
-- The scene was rendered in under 4 minutes and 32 seconds using CUDA. (Timing screenshot provided below the image)
-- For comparison, the same image takes 32 min 53 seconds on CPU which gives us a speedup of 7.25x
+- The images below are rendered at a resolution of 1200 × 675 with 500 samples per pixel and a maximum ray bounce limit of 50.
+- This results in total of 20.25 billion rays traced in the worst case.
+- The scene was rendered in under 4 minutes and 32 seconds (*Fig. 1.2*) using CUDA acceleration.
+- For comparison, the same image takes 32 minutes 53 seconds (*Fig. 2.2*) on CPU.
+- Speedup achieved is 7.25x
 
 <table>
   <tr>
@@ -49,7 +50,7 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
 ## How to Run 
 The project uses [CMake](https://cmake.org/) as the meta build system.
 
-### GPU based Raytracer
+### CUDA Accelerated Raytracer
 The project requires CUDA 12.6 as the minimum required version.
 
 Checkout `cuda` branch:
@@ -70,7 +71,7 @@ For Debug build run:
 cmake --build build --config Debug
 ```
 
-### CPU based Raytracer
+### CPU Raytracer
 
 Checkout `main` branch:
 ```
