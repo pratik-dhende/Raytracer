@@ -16,7 +16,6 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
   - Dielectric material with Total Internal Reflection and Schlick Approximation
 - Dynamic Camera
 - Defocus Blur
-- Global illumination - Recursive Ray Tracing with Bounce Limit
 
 ## CUDA vs CPU
 - The images below were rendered at a resolution of 1200 × 675, using 500 samples per pixel and a maximum ray bounce depth of 50.
