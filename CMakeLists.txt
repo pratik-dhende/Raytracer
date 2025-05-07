@@ -18,7 +18,7 @@ if(WIN32)
 endif()
 
 # CUDA setup
-find_package(CUDAToolkit REQUIRED)
+find_package(CUDAToolkit 12.6 REQUIRED)
 
 # Main target
 add_executable(Raytracer src/Main.cu)
@@ -42,11 +42,5 @@ target_link_libraries(Raytracer PRIVATE CUDA::cudart CUDA::cublas CUDA::curand)
 add_custom_command(TARGET Raytracer POST_BUILD
     COMMAND $<TARGET_FILE:Raytracer> > out.ppm
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-# Profiling
-add_custom_target(profile
-    COMMAND nsys profile --stats=true --trace=cuda,nvtx,osrt -o raytracer_profile $<TARGET_FILE:Raytracer>
-    DEPENDS Raytracer
 )
 
