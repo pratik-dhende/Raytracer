@@ -22,10 +22,29 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
 - The image below was rendered at a resolution of 1200 × 675 with 500 samples per pixel and a maximum ray bounce limit of 50.
 - This results in a total of 20.25 billion rays traced.
 - The scene was rendered in under 4 minutes and 32 seconds using CUDA. (Timing screenshot provided below the image)
+- For comparison, the same image takes 32 min 53 seconds on CPU which gives us a speedup of 7.25x
+
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/8ffade08-0ae4-4dc1-95fb-58d2bc7962e2" width="1200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/ea087ffc-0d40-4de1-b4a0-a3b1dc3d3f89" width="1200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Figure 1.1: GPU Render Output</em></td>
+    <td align="center"><em>Figure 2.1: CPU Render Output</em></td>
+  </tr>
+
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/1990977c-e7fb-4d90-9b4a-f7871165efe3" width ="1200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/3f4d0bf3-ae4b-4092-a8eb-07a819ce2419" width="1200"/></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Figure 1.2: GPU Rendering Time</em></td>
+    <td align="center"><em>Figure 2.2: CPU Rendering Time</em></td>
+  </tr>
+</table>
   
-![final-scene-release-render](https://github.com/user-attachments/assets/8ffade08-0ae4-4dc1-95fb-58d2bc7962e2)
-  
-![final-scene-release-time-highlighted](https://github.com/user-attachments/assets/831a5f77-3f84-495b-9e12-73d7f61703cb)
+
 
 ## How to Run 
 The project uses [CMake](https://cmake.org/) as the meta build system.
