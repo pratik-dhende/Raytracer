@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(CudaProject VERSION 1.0.0 LANGUAGES CXX CUDA)
+project(Raytracer VERSION 1.0.0 LANGUAGES CXX CUDA)
 
 # Modern CMake features
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -22,18 +22,16 @@ find_package(CUDAToolkit REQUIRED)
 
 # Main target
 add_executable(Raytracer src/Main.cu)
-# target_include_directories(Raytracer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Compiler options
-option(DEBUG_MODE "Debug mode" ON)
 target_compile_options(Raytracer PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:
-        $<$<BOOL:${DEBUG_MODE}>:-g;-G>
-        $<$<NOT:$<BOOL:${DEBUG_MODE}>>:-O3;--use_fast_math>
+        $<$<CONFIG:Debug>:-g;-G>
+        $<$<CONFIG:Release>:-O3;--use_fast_math> 
     >
     $<$<COMPILE_LANGUAGE:CXX>:
-        $<$<BOOL:${DEBUG_MODE}>:-g;-O0>
-        $<$<NOT:$<BOOL:${DEBUG_MODE}>>:-O3>
+        $<$<CONFIG:Debug>:-g;-O0> 
+        $<$<CONFIG:Release>:-O3> 
     >
 )
 
