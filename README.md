@@ -18,12 +18,11 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
 - Defocus Blur
 - Global illumination - Recursive Ray Tracing with Bounce Limit
 
-## Render Output
-- The images below are rendered at a resolution of 1200 × 675 with 500 samples per pixel and a maximum ray bounce limit of 50.
-- This results in total of 20.25 billion rays traced in the worst case.
-- The scene was rendered in under 4 minutes and 32 seconds (*Fig. 1.2*) using CUDA acceleration.
-- For comparison, the same image takes 32 minutes 53 seconds (*Fig. 2.2*) on CPU.
-- Speedup achieved is 7.25x
+## CUDA vs CPU
+- The images below were rendered at a resolution of 1200 × 675, using 500 samples per pixel and a maximum ray bounce depth of 50.
+- This configuration results in up to 20.25 billion rays traced in the worst case.
+- The scene shown in Fig. 1.1 was rendered in under 4 minutes and 32 seconds (Fig. 1.2) with CUDA acceleration.
+- For comparison, the scene in Fig. 2.1, rendered with the same configuration as Fig. 1.1, took 32 minutes and 53 seconds on the CPU (Fig. 2.2), achieving a `7.25×` speedup with GPU acceleration.
 
 <table>
   <tr>
@@ -40,8 +39,8 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
     <td><img src="https://github.com/user-attachments/assets/3f4d0bf3-ae4b-4092-a8eb-07a819ce2419" width="1200"/></td>
   </tr>
   <tr>
-    <td align="center"><em>Figure 1.2: GPU Rendering Time</em></td>
-    <td align="center"><em>Figure 2.2: CPU Rendering Time</em></td>
+    <td align="center"><em>Figure 1.2: GPU Rendering Time (hh:mm:ss)</em></td>
+    <td align="center"><em>Figure 2.2: CPU Rendering Time (hh:mm:ss)</em></td>
   </tr>
 </table>
   
