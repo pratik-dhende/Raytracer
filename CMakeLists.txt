@@ -12,28 +12,11 @@ set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
-# Architecture
-if(WIN32)
-    set(CMAKE_GENERATOR_PLATFORM x64)
-endif()
-
 # CUDA setup
 find_package(CUDAToolkit 12.6 REQUIRED)
 
 # Main target
 add_executable(Raytracer src/Main.cu)
-
-# Compiler options
-target_compile_options(Raytracer PRIVATE
-    $<$<COMPILE_LANGUAGE:CUDA>:
-        $<$<CONFIG:Debug>:-g;-G>
-        $<$<CONFIG:Release>:-O3;--use_fast_math> 
-    >
-    $<$<COMPILE_LANGUAGE:CXX>:
-        $<$<CONFIG:Debug>:-g;-O0> 
-        $<$<CONFIG:Release>:-O3> 
-    >
-)
 
 # CUDA libraries
 target_link_libraries(Raytracer PRIVATE CUDA::cudart CUDA::cublas CUDA::curand)
