@@ -10,3 +10,8 @@ add_executable(Raytracer src/Main.cpp src/Vec3.cpp)
 target_include_directories(Raytracer PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
+
+add_custom_command(TARGET Raytracer POST_BUILD
+    COMMAND $<TARGET_FILE:Raytracer> > out.ppm
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
