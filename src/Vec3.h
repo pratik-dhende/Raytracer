@@ -80,6 +80,10 @@ public:
         return m_z;
     }
 
+    double operator[](int index) const {
+        return (index == 0) ? m_x : (index == 1 ? m_y : m_z);
+    }
+
     double magnitude() const {
         return std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);;
     }
@@ -123,17 +127,17 @@ public:
         return (std::abs(m_x) < eps) && (std::abs(m_y) < eps) && (std::abs(m_z) < eps);
     }
 
-    static Vec3 random() {
-        return Vec3(::random(), ::random(), ::random());
+    static Vec3 randomDouble() {
+        return Vec3(::randomDouble(), ::randomDouble(), ::randomDouble());
     }
 
-    static Vec3 random(const double min, const double max) {
-        return Vec3(::random(min, max), ::random(min, max), ::random(min, max));
+    static Vec3 randomDouble(const double min, const double max) {
+        return Vec3(::randomDouble(min, max), ::randomDouble(min, max), ::randomDouble(min, max));
     }
 
     static Vec3 randomUnitVector() {
         while(true) {
-            auto p = Vec3::random(-1.0, 1.0);
+            auto p = Vec3::randomDouble(-1.0, 1.0);
             double magnitudeSquared = p.magnitudeSquared();
             if (1.0e-160 < magnitudeSquared && magnitudeSquared <= 1.0) {
                 return p.normalized();
@@ -143,7 +147,7 @@ public:
     
     static Vec3 randomVectorInUnitCircle() {
         while(true) {
-            auto v = Vec3(::random(-1.0, 1.0), ::random(-1.0, 1.0), 0.0);
+            auto v = Vec3(::randomDouble(-1.0, 1.0), ::randomDouble(-1.0, 1.0), 0.0);
             if (v.magnitude() < 1.0) {
                 return v;
             }

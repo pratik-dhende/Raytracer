@@ -2,6 +2,7 @@
 
 #include "Ray.h"
 #include "Interval.h"
+#include "AABB.h"
 
 class Material;
 
@@ -36,4 +37,6 @@ class Hittable {
         virtual ~Hittable() = default;
 
         virtual bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const = 0;
+
+        virtual AABB boundingVolume() const = 0;
 };

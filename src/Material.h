@@ -64,7 +64,7 @@ class Dielectric : public Material {
             double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
             
             Vec3 scatteringDirection;
-            if (refractiveIndexReciprocal * sinTheta > 1.0 || reflectance(cosTheta, refractiveIndexReciprocal) > random()) {
+            if (refractiveIndexReciprocal * sinTheta > 1.0 || reflectance(cosTheta, refractiveIndexReciprocal) > randomDouble()) {
                 scatteringDirection = Vec3::reflect(unitRayInDirection, hitInfo.getNormal());
             }
             else {
