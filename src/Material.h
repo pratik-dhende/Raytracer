@@ -25,7 +25,7 @@ public:
             scatteringDirection = hitInfo.getNormal();
         }
 
-        scatteredRay = Ray(hitInfo.p, scatteringDirection);
+        scatteredRay = Ray(hitInfo.p, scatteringDirection, rayIn.time());
         attenuation = this->albedo;
         return true;
     }
@@ -41,7 +41,7 @@ public:
     bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const override {
         auto scatteringDirection = Vec3::reflect(rayIn.direction(), hitInfo.getNormal());
         scatteringDirection = scatteringDirection.normalized() + this->fuzz * Vec3::randomUnitVector();
-        scatteredRay = Ray(hitInfo.p, scatteringDirection);
+        scatteredRay = Ray(hitInfo.p, scatteringDirection, rayIn.time());
         attenuation = this->albedo;
         return Vec3::dot(hitInfo.getNormal(), scatteringDirection) > 0.0;
     }
@@ -71,7 +71,7 @@ class Dielectric : public Material {
                 scatteringDirection = Vec3::refract(unitRayInDirection, hitInfo.getNormal(), refractiveIndexReciprocal);
             }
 
-            scatteredRay = Ray(hitInfo.p, scatteringDirection);
+            scatteredRay = Ray(hitInfo.p, scatteringDirection, rayIn.time());
             attenuation = Color(1.0);
             return true;
         }

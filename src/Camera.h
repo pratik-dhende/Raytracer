@@ -113,7 +113,8 @@ private:
         const Point3 samplePosition = pixel00Position + ((static_cast<double>(x) + offset.x()) * du) + ((static_cast<double>(y) + offset.y())  * dv);
         
         auto rayOrigin = defocusAngle <= 0.0 ? this->eyePosition : sampleDefocusDisk();
-        return Ray(rayOrigin, samplePosition - rayOrigin);
+        auto rayTime = random();
+        return Ray(rayOrigin, samplePosition - rayOrigin, rayTime);
     }
 
     Point3 sampleSquare() const {
