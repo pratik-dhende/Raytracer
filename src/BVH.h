@@ -19,7 +19,10 @@ public:
             right = hittables[start + 1];
         }
         else {
-            int axis = randomInt(0, 2);
+            for(int i = start; i < end; ++i) {
+                aabb = AABB(aabb, hittables[i]->boundingVolume());
+            }
+            int axis = aabb.longestAxis();
 
             const auto aabbComparator = [axis](const std::shared_ptr<Hittable>& first, const std::shared_ptr<Hittable>& second) {
                 return first->boundingVolume().axisInterval(axis) < second->boundingVolume().axisInterval(axis);
@@ -31,8 +34,6 @@ public:
             left = std::make_shared<BVH>(hittables, start, mid);
             right = std::make_shared<BVH>(hittables, mid, end);
         }
-
-        aabb = AABB(left->boundingVolume(), right->boundingVolume());
     }
 
     bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const {

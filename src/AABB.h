@@ -12,6 +12,10 @@ public:
         
     }
 
+    constexpr AABB(const Interval& _x, const Interval& _y, const Interval& _z) noexcept : x(_x), y(_y), z(_z) {
+
+    }
+
     constexpr AABB(const AABB& aabb0, const AABB& aabb1) noexcept {
         x = Interval(aabb0.x, aabb1.x);
         y = Interval(aabb0.y, aabb1.y);
@@ -36,6 +40,15 @@ public:
         return true;
     }
 
+    int longestAxis() const {
+        return y.size() > z.size() ? (x.size() > y.size() ?  0 : 1) : (x.size() > z.size() ? 0 : 2);
+    }
+
+    static const AABB EMPTY, UNIVERSE;
+
 private:
     Interval x, y, z;
 };
+
+const AABB AABB::EMPTY = AABB(Interval::EMPTY, Interval::EMPTY, Interval::EMPTY);
+const AABB AABB::UNIVERSE = AABB(Interval::UNIVERSE, Interval::UNIVERSE, Interval::UNIVERSE);

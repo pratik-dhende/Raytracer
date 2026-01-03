@@ -70,7 +70,6 @@ int main() {
     camera.focusDistance = 10.0;
 
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
-
     camera.render(*world);
 
     return 0;
