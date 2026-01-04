@@ -33,7 +33,7 @@ public:
     Color value(double u, double v, const Point3& p) const override {
         const Vec3 floored_p = Vec3::floor(p * m_inverseScale);
 
-        if (static_cast<int>(floored_p.x() + floored_p.y() + floored_p.z()) & 1) {
+        if ((static_cast<int>(floored_p.x()) + static_cast<int>(floored_p.y()) + static_cast<int>(floored_p.z())) & 1) {
             return m_oddTexture->value(u, v, p);
         }
         
