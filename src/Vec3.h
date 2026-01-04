@@ -115,6 +115,13 @@ public:
         return *this;
     }
 
+    Vec3& operator*=(const double scalar) {
+        m_x *= scalar;
+        m_y *= scalar;
+        m_z *= scalar;
+        return *this;
+    }
+
     Vec3& operator*=(const int scalar) {
         m_x *= scalar;
         m_y *= scalar;
@@ -183,6 +190,10 @@ public:
 
     static Vec3 cross(const Vec3& v1, const Vec3& v2) {
         return Vec3(v1.y() * v2.z() - v2.y() * v1.z(), v2.x() * v1.z() - v1.x() * v2.z(), v1.x() * v2.y() - v2.x() * v1.y());
+    }
+
+    static Vec3 floor(const Vec3& v) {
+        return Vec3(std::floor(v.m_x), std::floor(v.m_y), std::floor(v.m_z));
     }
 };
 
