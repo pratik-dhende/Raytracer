@@ -36,7 +36,26 @@ public:
         return trilinearInterpolation(c, u, v, w);
     }
 
-    private:
+    double turbulence(const Point3& p, int depth) const {
+        double accumulator = 0.0;
+        Point3 tmpP = p;
+        
+        static constexpr double FREQ_SCALE = 2.0;
+        static constexpr double AMP_SCALE = 0.5;
+
+        double amplitude = 1.0;
+        double frequency = 1.0;
+
+        for(int i = 0; i < depth; ++i) {
+            accumulator += amplitude * noise(tmpP * frequency);
+            amplitude *= AMP_SCALE;
+            frequency *= FREQ_SCALE;
+        }
+
+        return std::abs(accumulator);
+    }
+
+private:
     static const int point_count = 256;
     Vec3 randVec[point_count];
     int perm_x[point_count];

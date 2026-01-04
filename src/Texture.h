@@ -72,7 +72,7 @@ public:
     PerlinNoiseTexture(const double frequency) : m_frequency(frequency) {}
 
     Color value(double u, double v, const Point3& p) const override {
-        return Color(1,1,1) * 0.5 * (m_noise.noise(p * m_frequency) + 1.0);
+        return Color(.5, .5, .5) * (1 + std::sin(m_frequency * p.z() + 10 * m_noise.turbulence(p, 7)));
     }
 
 private:
