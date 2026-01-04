@@ -24,6 +24,10 @@ public:
         auto j = int(std::floor(p.y()));
         auto k = int(std::floor(p.z()));
 
+        u = hermiteCubic(u);
+        v = hermiteCubic(v);
+        w = hermiteCubic(w);
+
         double c[2][2][2];
         for(int di = 0; di < 2; ++di) {
             for(int dj = 0; dj < 2; ++dj) {
@@ -68,5 +72,9 @@ public:
         }
 
         return accumulator;
+    }
+
+    static double hermiteCubic(const double t) {
+        return t * t * (3.0 - 2.0 * t);
     }
 };
