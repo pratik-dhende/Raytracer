@@ -45,7 +45,11 @@ class Sphere : public Hittable {
 
             hitInfo.t = rayTInterval.surrounds(t1) ? t1 : t2;
             hitInfo.p = ray.at(hitInfo.t);
-            hitInfo.setNormal(ray, (hitInfo.p - this->center.at(ray.time())) / this->radius);
+
+            Vec3 outwardNormal = (hitInfo.p - this->center.at(ray.time())) / this->radius;
+            hitInfo.setNormal(ray, outwardNormal);
+
+            getSphereUV(outwardNormal, hitInfo.u, hitInfo.v);
             hitInfo.material = material;
             
             return true;
@@ -60,4 +64,14 @@ class Sphere : public Hittable {
         double radius;
         std::shared_ptr<Material> material;
         AABB aabb;
+
+    private:
+        static void getSphereUV(const Point3& p, double& u, double& v) {
+            double phi = std::atan2(-p.z(), p.x()) + PI;
+            double theta = std::acos(-p.y());
+
+            constexpr double INV_PI = 1.0 / PI;
+            u = phi * 0.5 * INV_PI;
+            v = theta * INV_PI;
+        }
 };

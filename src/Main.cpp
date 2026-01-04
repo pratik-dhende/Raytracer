@@ -101,8 +101,64 @@ void renderCheckeredSpheres() {
     camera.render(*world);
 }
 
+void renderEarth() {
+    Scene scene;
+
+    auto earthTexture = std::make_shared<ImageTexture>("../textures/earthmap.jpg");
+    scene.add(std::make_shared<Sphere>(Point3(0.0), 2.0, std::make_shared<Lambertian>(earthTexture)));
+
+    Camera camera;
+
+    camera.aspectRatio = 16.0 / 9.0;
+    camera.imageWidth = 400;
+    camera.samplesPerPixel = 100;
+    camera.maxDepth = 50;
+
+    camera.vertifcalFov = 20.0;
+    camera.eyePosition = Point3(0.0, 0.0, 12.0);
+    camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
+    camera.up = Vec3(0.0, 1.0, 0.0);
+
+    camera.defocusAngle = 0.0;
+    camera.focusDistance = 10.0;
+
+    std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    camera.render(*world);
+}
+
+void renderPerlinSpheres() {
+    Scene scene;
+    
+    auto perlinNoiseTexture = std::make_shared<PerlinNoiseTexture>();
+    scene.add(std::make_shared<Sphere>(Point3(0.0, -1000.0, 0.0), 1000.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
+    scene.add(std::make_shared<Sphere>(Point3(0.0, 2.0, 0.0), 2.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
+
+    Camera camera;
+
+    camera.aspectRatio = 16.0 / 9.0;
+    camera.imageWidth = 400;
+    camera.samplesPerPixel = 100;
+    camera.maxDepth = 50;
+
+    camera.vertifcalFov = 20.0;
+    camera.eyePosition = Point3(13.0, 2.0, 3.0);
+    camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
+    camera.up = Vec3(0.0, 1.0, 0.0);
+
+    camera.defocusAngle = 0.0;
+    camera.focusDistance = 10.0;
+
+    std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    camera.render(*world);
+}
+
 int main() {
-    renderCheckeredSpheres();
+    switch(4) {
+        case 1 : renderBouncingSpheres(); break;
+        case 2 : renderCheckeredSpheres(); break;
+        case 3 : renderEarth(); break;
+        case 4 : renderPerlinSpheres(); break;
+    }
 
     return 0;
 }
