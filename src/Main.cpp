@@ -6,6 +6,7 @@
 #include "Material.h"
 #include "BVH.h"
 #include "Texture.h"
+#include "Quad.h"
 
 #include <iostream>
 
@@ -152,12 +153,49 @@ void renderPerlinSpheres() {
     camera.render(*world);
 }
 
+void renderQuads() {
+    Scene scene;
+
+    // Materials
+    auto left_red     = std::make_shared<Lambertian>(Color(1.0, 0.2, 0.2));
+    auto back_green   = std::make_shared<Lambertian>(Color(0.2, 1.0, 0.2));
+    auto right_blue   = std::make_shared<Lambertian>(Color(0.2, 0.2, 1.0));
+    auto upper_orange = std::make_shared<Lambertian>(Color(1.0, 0.5, 0.0));
+    auto lower_teal   = std::make_shared<Lambertian>(Color(0.2, 0.8, 0.8));
+
+    // Quads
+    scene.add(std::make_shared<Quad>(Point3(-3.0, -2.0, 5.0), Vec3(0.0, 0.0,-4.0), Vec3(0.0, 4.0, 0.0), left_red));
+    scene.add(std::make_shared<Quad>(Point3(-2.0, -2.0, 0.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 4.0, 0.0), back_green));
+    scene.add(std::make_shared<Quad>(Point3( 3.0, -2.0, 1.0), Vec3(0.0, 0.0, 4.0), Vec3(0.0, 4.0, 0.0), right_blue));
+    scene.add(std::make_shared<Quad>(Point3(-2.0,  3.0, 1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 0.0, 4.0), upper_orange));
+    scene.add(std::make_shared<Quad>(Point3(-2.0, -3.0, 5.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 0.0,-4.0), lower_teal));
+
+    Camera camera;
+
+    camera.aspectRatio      = 1.0;
+    camera.imageWidth       = 400;
+    camera.samplesPerPixel  = 100;
+    camera.maxDepth         = 50;
+
+    camera.vertifcalFov     = 80.0;
+    camera.eyePosition      = Point3(0.0, 0.0, 9.0);
+    camera.lookAtPosition   = Point3(0.0, 0.0, 0.0);
+    camera.up               = Vec3(0.0, 1.0, 0.0);
+
+    camera.defocusAngle = 0;
+
+    std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    camera.render(*world);
+}
+
+
 int main() {
-    switch(4) {
+    switch(5) {
         case 1 : renderBouncingSpheres(); break;
         case 2 : renderCheckeredSpheres(); break;
         case 3 : renderEarth(); break;
         case 4 : renderPerlinSpheres(); break;
+        case 5 : renderQuads(); break;
     }
 
     return 0;

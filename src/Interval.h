@@ -24,7 +24,7 @@ class Interval {
 
     constexpr Interval(const Interval& i0, const Interval& i1) noexcept : Interval(merge(i0, i1)) {}
 
-    double size() const noexcept {
+    constexpr double size() const noexcept {
         return max - min;
     }
 
@@ -44,9 +44,10 @@ class Interval {
         return std::max(this->min, std::min(x, this->max));
     }
 
-    Interval expand(const double padding) const noexcept {
+    void expand(const double padding) noexcept {
         const double delta = padding / 2;
-        return Interval(min - delta, max + delta);
+        min -= delta;
+        max += delta;
     }
 
     bool operator<(const Interval& other) {

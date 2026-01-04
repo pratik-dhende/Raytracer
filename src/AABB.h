@@ -6,20 +6,24 @@
 
 class AABB {
 public:
-    constexpr AABB() noexcept {};
+    constexpr AABB() noexcept {
+        addMinPadding();
+    };
 
     constexpr AABB(const Point3& min, const Point3& max) noexcept : x(min.x(), max.x()), y(min.y(), max.y()), z(min.z(), max.z()) {
-        
+        addMinPadding();
     }
 
     constexpr AABB(const Interval& _x, const Interval& _y, const Interval& _z) noexcept : x(_x), y(_y), z(_z) {
-
+        addMinPadding();
     }
 
     constexpr AABB(const AABB& aabb0, const AABB& aabb1) noexcept {
         x = Interval(aabb0.x, aabb1.x);
         y = Interval(aabb0.y, aabb1.y);
         z = Interval(aabb0.z, aabb1.z);
+
+        addMinPadding();
     }
 
     Interval axisInterval(int axis) const noexcept {
@@ -48,6 +52,22 @@ public:
 
 private:
     Interval x, y, z;
+
+    constexpr void addMinPadding() {
+        constexpr double PADDING = 0.0001;
+
+        if (x.size() < PADDING) {
+            x.expand(PADDING);
+        }
+
+        if (y.size() < PADDING) {
+            y.expand(PADDING);
+        }
+
+        if (z.size() < PADDING) {
+            z.expand(PADDING);
+        }
+    }
 };
 
 const AABB AABB::EMPTY = AABB(Interval::EMPTY, Interval::EMPTY, Interval::EMPTY);
