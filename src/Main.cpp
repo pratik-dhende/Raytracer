@@ -129,7 +129,7 @@ void renderEarth() {
 void renderPerlinSpheres() {
     Scene scene;
     
-    auto perlinNoiseTexture = std::make_shared<PerlinNoiseTexture>();
+    auto perlinNoiseTexture = std::make_shared<PerlinNoiseTexture>(4.0);
     scene.add(std::make_shared<Sphere>(Point3(0.0, -1000.0, 0.0), 1000.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
     scene.add(std::make_shared<Sphere>(Point3(0.0, 2.0, 0.0), 2.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
 

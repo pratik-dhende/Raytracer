@@ -3,7 +3,7 @@
 #include "Color.h"
 #include "Vec3.h"
 #include "rtw_stb_image.h"
-#include "Perlin.h"
+#include "PerlinNoise.h"
 
 class Texture {
 public:
@@ -69,13 +69,14 @@ private:
 
 class PerlinNoiseTexture : public Texture{
 public:
-    PerlinNoiseTexture() {}
+    PerlinNoiseTexture(const double frequency) : m_frequency(frequency) {}
 
     Color value(double u, double v, const Point3& p) const override {
-        return Color(1,1,1) * m_noise.noise(p);
+        return Color(1,1,1) * 0.5 * (m_noise.noise(p * m_frequency) + 1.0);
     }
 
 private:
     PerlinNoise m_noise;
+    double m_frequency;
 };
 
