@@ -243,6 +243,9 @@ void renderCornellBox() {
     scene.add(std::make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0,-555), white));
     scene.add(std::make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
 
+    scene.add(Quad::box(Point3(130, 0, 65), Point3(295, 165, 230), white));
+    scene.add(Quad::box(Point3(265, 0, 295), Point3(430, 330, 460), white));
+
     Camera camera;
 
     camera.aspectRatio      = 1.0;
@@ -258,10 +261,8 @@ void renderCornellBox() {
 
     camera.defocusAngle = 0;
 
-    // std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
-    // camera.render(*world);
-
-    camera.render(scene);
+    std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    camera.render(*world);
 }
 
 int main() {

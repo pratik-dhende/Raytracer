@@ -7,10 +7,14 @@
 class AABB {
 public:
     AABB() noexcept {
-        addMinPadding();
+        
     };
 
-    AABB(const Point3& min, const Point3& max) noexcept : x(min.x(), max.x()), y(min.y(), max.y()), z(min.z(), max.z()) {
+    AABB(const Point3& a, const Point3& b) noexcept {
+        x = Interval(std::min(a.x(), b.x()), std::max(a.x(), b.x()));
+        y = Interval(std::min(a.y(), b.y()), std::max(a.y(), b.y()));
+        z = Interval(std::min(a.z(), b.z()), std::max(a.z(), b.z()));
+
         addMinPadding();
     }
 

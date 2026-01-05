@@ -10,7 +10,6 @@ public:
     }
 
     BVH(std::vector<std::shared_ptr<Hittable>>& hittables, const int start, const int end) {
-
         for(int i = start; i < end; ++i) {
             aabb = AABB(aabb, hittables[i]->boundingVolume());
         }
@@ -38,7 +37,7 @@ public:
         }
     }
 
-    bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const {
+    bool hit(const Ray& ray, const Interval& rayTInterval, HitInfo& hitInfo) const override {
         if (!aabb.hit(ray, rayTInterval)) {
             return false;
         }
@@ -49,7 +48,7 @@ public:
         return leftHit || rightHit;
     }
 
-    AABB boundingVolume() const {
+    AABB boundingVolume() const override {
         return aabb;
     }
 
