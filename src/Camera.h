@@ -12,7 +12,7 @@ public:
     int samplesPerPixel = 10;
     int maxDepth = 10;
 
-    double vertifcalFov = 90.0;
+    double verticalFov = 90.0;
     Point3 eyePosition = Point3(0.0);
     Point3 lookAtPosition = Point3(0.0, 0.0, -1.0);
     Vec3 up = Point3(0.0, 1.0, 0.0);
@@ -61,7 +61,7 @@ private:
     Vec3 defocusDiskV;
 
     void init() {
-        const double verticalFovRadians = degreesToRadians(vertifcalFov);
+        const double verticalFovRadians = degreesToRadians(verticalFov);
         
         const double viewPortHeight = 2.0 * std::tan(verticalFovRadians / 2.0) * focusDistance;
         this->imageHeight = std::max(1, static_cast<int>(imageWidth / aspectRatio));

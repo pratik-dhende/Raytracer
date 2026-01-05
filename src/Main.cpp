@@ -14,7 +14,7 @@ void renderBouncingSpheres() {
     Scene scene;
 
     auto checkerTexture = std::make_shared<CheckerTexture>(0.32, Color(0.2, 0.3, 0.1), Color(0.9, 0.9, 0.9));
-    scene.add(std::make_shared<Sphere>(Point3(0.0 ,-1000.0 ,0.0), 1000.0, std::make_shared<Lambertian>(checkerTexture)));
+    scene.add(std::make_shared<Sphere>(Point3(0.0, -1000.0, 0.0), 1000.0, std::make_shared<Lambertian>(checkerTexture)));
 
     for (int a = -11; a < 11; ++a) {
         for (int b = -11; b < 11; ++b) {
@@ -63,7 +63,7 @@ void renderBouncingSpheres() {
     camera.samplesPerPixel = 100;
     camera.maxDepth = 50;
 
-    camera.vertifcalFov = 20.0;
+    camera.verticalFov = 20.0;
     camera.eyePosition = Point3(13.0, 2.0, 3.0);
     camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
     camera.up = Vec3(0.0, 1.0, 0.0);
@@ -92,7 +92,7 @@ void renderCheckeredSpheres() {
     camera.samplesPerPixel = 100;
     camera.maxDepth = 50;
 
-    camera.vertifcalFov = 20.0;
+    camera.verticalFov = 20.0;
     camera.eyePosition = Point3(13.0, 2.0, 3.0);
     camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
     camera.up = Vec3(0.0, 1.0, 0.0);
@@ -119,7 +119,7 @@ void renderEarth() {
     camera.samplesPerPixel = 100;
     camera.maxDepth = 50;
 
-    camera.vertifcalFov = 20.0;
+    camera.verticalFov = 20.0;
     camera.eyePosition = Point3(0.0, 0.0, 12.0);
     camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
     camera.up = Vec3(0.0, 1.0, 0.0);
@@ -147,7 +147,7 @@ void renderPerlinSpheres() {
     camera.samplesPerPixel = 100;
     camera.maxDepth = 50;
 
-    camera.vertifcalFov = 20.0;
+    camera.verticalFov = 20.0;
     camera.eyePosition = Point3(13.0, 2.0, 3.0);
     camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
     camera.up = Vec3(0.0, 1.0, 0.0);
@@ -185,7 +185,7 @@ void renderQuads() {
     camera.samplesPerPixel  = 100;
     camera.maxDepth         = 50;
 
-    camera.vertifcalFov     = 80.0;
+    camera.verticalFov     = 80.0;
     camera.eyePosition      = Point3(0.0, 0.0, 9.0);
     camera.lookAtPosition   = Point3(0.0, 0.0, 0.0);
     camera.up               = Vec3(0.0, 1.0, 0.0);
@@ -217,7 +217,7 @@ void renderSimpleLight() {
     camera.maxDepth         = 50;
     camera.backgroundColor  = Color(0.0);
 
-    camera.vertifcalFov     = 20;
+    camera.verticalFov     = 20;
     camera.eyePosition      = Point3(26.0, 3.0, 6.0);
     camera.lookAtPosition   = Point3(0.0, 2.0, 0.0);
     camera.up               = Vec3(0.0, 1.0, 0.0);
@@ -228,15 +228,51 @@ void renderSimpleLight() {
     camera.render(*world);
 }
 
+void renderCornellBox() {
+    Scene scene;
+
+    auto red   = std::make_shared<Lambertian>(Color(.65, .05, .05));
+    auto white = std::make_shared<Lambertian>(Color(.73, .73, .73));
+    auto green = std::make_shared<Lambertian>(Color(.12, .45, .15));
+    auto light = std::make_shared<DiffuseLight>(Color(15, 15, 15));
+
+    scene.add(std::make_shared<Quad>(Point3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), green));
+    scene.add(std::make_shared<Quad>(Point3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+    scene.add(std::make_shared<Quad>(Point3(343, 554, 332), Vec3(-130, 0, 0), Vec3(0, 0,-105), light));
+    scene.add(std::make_shared<Quad>(Point3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555), white));
+    scene.add(std::make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0,-555), white));
+    scene.add(std::make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
+
+    Camera camera;
+
+    camera.aspectRatio      = 1.0;
+    camera.imageWidth       = 600;
+    camera.samplesPerPixel  = 200;
+    camera.maxDepth         = 50;
+    camera.backgroundColor  = Color(0, 0, 0);
+
+    camera.verticalFov      = 40;
+    camera.eyePosition      = Point3(278, 278, -800);
+    camera.lookAtPosition   = Point3(278, 278, 0);
+    camera.up               = Vec3(0, 1, 0);
+
+    camera.defocusAngle = 0;
+
+    // std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    // camera.render(*world);
+
+    camera.render(scene);
+}
 
 int main() {
-    switch(6) {
+    switch(7) {
         case 1 : renderBouncingSpheres(); break;
         case 2 : renderCheckeredSpheres(); break;
         case 3 : renderEarth(); break;
         case 4 : renderPerlinSpheres(); break;
         case 5 : renderQuads(); break;
         case 6 : renderSimpleLight(); break;
+        case 7 : renderCornellBox(); break;
     }
 
     return 0;

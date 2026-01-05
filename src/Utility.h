@@ -12,7 +12,7 @@ static inline double degreesToRadians(const double degree) {
 
 static inline double randomDouble() {
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::mt19937 generator(5);
+    static std::mt19937 generator(17);
     return distribution(generator);
 }
 
