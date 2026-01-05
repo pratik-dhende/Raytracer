@@ -3,28 +3,28 @@
 #include "Utility.h"
 
 class Interval {
-  public:
+public:
     double min, max;
 
-    static constexpr bool overlap(const Interval& i1, const Interval& i2) {
+    static bool overlap(const Interval& i1, const Interval& i2) {
         return i1.min <= i2.max && i2.max >= i1.min;
     }
 
-    static constexpr Interval intersection(const Interval& i0, const Interval& i1) {
+    static Interval intersection(const Interval& i0, const Interval& i1) {
         return Interval(std::max(i0.min, i1.min), std::min(i0.max, i1.max));
     }
 
-    static constexpr Interval merge(const Interval& i0, const Interval& i1) {
+    static Interval merge(const Interval& i0, const Interval& i1) {
         return Interval(std::min(i0.min, i1.min), std::max(i0.max, i1.max));
     }
 
-    constexpr Interval() noexcept : min(POSITIVE_INFINITY), max(-POSITIVE_INFINITY) {} // Default interval is empty
+    Interval() noexcept : min(POSITIVE_INFINITY), max(-POSITIVE_INFINITY) {} // Default interval is empty
 
     constexpr Interval(const double _min, const double _max) noexcept : min(_min), max(_max) {}
 
-    constexpr Interval(const Interval& i0, const Interval& i1) noexcept : Interval(merge(i0, i1)) {}
+    Interval(const Interval& i0, const Interval& i1) noexcept : Interval(merge(i0, i1)) {}
 
-    constexpr double size() const noexcept {
+    double size() const noexcept {
         return max - min;
     }
 

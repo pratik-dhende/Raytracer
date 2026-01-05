@@ -206,6 +206,7 @@ void renderSimpleLight() {
     scene.add(std::make_shared<Sphere>(Point3(0.0, 2.0, 0.0), 2.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
 
     auto diffuseLightMaterial = std::make_shared<DiffuseLight>(Color(4.0));
+    scene.add(std::make_shared<Sphere>(Point3(0.0, 7.0, 0.0), 2.0, diffuseLightMaterial));
     scene.add(std::make_shared<Quad>(Point3(3.0, 1.0, -2.0), Vec3(2.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), diffuseLightMaterial));
 
     Camera camera;

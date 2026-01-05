@@ -10,6 +10,11 @@ public:
     }
 
     BVH(std::vector<std::shared_ptr<Hittable>>& hittables, const int start, const int end) {
+
+        for(int i = start; i < end; ++i) {
+            aabb = AABB(aabb, hittables[i]->boundingVolume());
+        }
+
         int n = end - start;
         if (n == 1) {
             left = right = hittables[start];
@@ -19,9 +24,6 @@ public:
             right = hittables[start + 1];
         }
         else {
-            for(int i = start; i < end; ++i) {
-                aabb = AABB(aabb, hittables[i]->boundingVolume());
-            }
             int axis = aabb.longestAxis();
 
             const auto aabbComparator = [axis](const std::shared_ptr<Hittable>& first, const std::shared_ptr<Hittable>& second) {
@@ -42,7 +44,7 @@ public:
         }
 
         bool leftHit = left->hit(ray, rayTInterval, hitInfo);
-        bool rightHit = right->hit(ray, rayTInterval, hitInfo);
+        bool rightHit = right->hit(ray, Interval(rayTInterval.min, leftHit ? hitInfo.t : rayTInterval.max), hitInfo);
 
         return leftHit || rightHit;
     }

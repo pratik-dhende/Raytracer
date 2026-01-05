@@ -5,6 +5,8 @@
 #include "rtw_stb_image.h"
 #include "PerlinNoise.h"
 
+#include <algorithm>
+
 class Texture {
 public:
     virtual ~Texture() {};

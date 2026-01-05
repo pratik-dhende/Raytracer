@@ -25,15 +25,15 @@ private:
     double m_z;
 
 public:
-    constexpr Vec3(double x, double y, double z) : m_x(x), m_y(y), m_z(z) {
+    Vec3(double x, double y, double z) : m_x(x), m_y(y), m_z(z) {
 
     }
 
-    constexpr Vec3(double scalar) : Vec3(scalar, scalar, scalar) {
+    Vec3(double scalar) : Vec3(scalar, scalar, scalar) {
 
     }
 
-    constexpr Vec3() : Vec3(0.0) {
+    Vec3() : Vec3(0.0) {
 
     }
 
