@@ -20,6 +20,8 @@ public:
     double defocusAngle = 0.0;
     double focusDistance = 10.0;
 
+    Color backgroundColor;
+
 public:
     void render(const Hittable& world)  {
         init();
@@ -96,16 +98,16 @@ private:
             Color attenuation;
             Ray scatteredRay;
 
+            auto emittedColor = hitInfo.material->emit(hitInfo.u, hitInfo.v, hitInfo.p);
+
             if (hitInfo.material->scatter(ray, hitInfo, attenuation, scatteredRay)) {
-                return attenuation * rayColor(scatteredRay, world, depth - 1);
+                return emittedColor + attenuation * rayColor(scatteredRay, world, depth - 1);
             }
 
-            return Color(0.0);
+            return emittedColor;
         }
         
-        Vec3 unitDirection = ray.direction().normalized();
-        auto a = 0.5 * (unitDirection.y() + 1.0);
-        return (1.0 - a) * Color(1.0) + a * Color(0.5, 0.7, 1.0);
+        return backgroundColor;
     }
 
     Ray sampleRay(const int x, const int y) const {

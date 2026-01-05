@@ -71,6 +71,8 @@ void renderBouncingSpheres() {
     camera.defocusAngle = 0.6;
     camera.focusDistance = 10.0;
 
+    camera.backgroundColor = Color(0.70, 0.80, 1.00);
+
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
     camera.render(*world);
 }
@@ -98,6 +100,8 @@ void renderCheckeredSpheres() {
     camera.defocusAngle = 0.0;
     camera.focusDistance = 10.0;
 
+    camera.backgroundColor = Color(0.70, 0.80, 1.00);
+
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
     camera.render(*world);
 }
@@ -122,6 +126,8 @@ void renderEarth() {
 
     camera.defocusAngle = 0.0;
     camera.focusDistance = 10.0;
+
+    camera.backgroundColor = Color(0.70, 0.80, 1.00);
 
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
     camera.render(*world);
@@ -148,6 +154,8 @@ void renderPerlinSpheres() {
 
     camera.defocusAngle = 0.0;
     camera.focusDistance = 10.0;
+
+    camera.backgroundColor = Color(0.70, 0.80, 1.00);
 
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
     camera.render(*world);
@@ -184,18 +192,50 @@ void renderQuads() {
 
     camera.defocusAngle = 0;
 
+    camera.backgroundColor = Color(0.70, 0.80, 1.00);
+
+    std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    camera.render(*world);
+}
+
+void renderSimpleLight() {
+    Scene scene;
+
+    auto perlinNoiseTexture = std::make_shared<PerlinNoiseTexture>(4);
+    scene.add(std::make_shared<Sphere>(Point3(0.0, -1000.0, 0.0), 1000.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
+    scene.add(std::make_shared<Sphere>(Point3(0.0, 2.0, 0.0), 2.0, std::make_shared<Lambertian>(perlinNoiseTexture)));
+
+    auto diffuseLightMaterial = std::make_shared<DiffuseLight>(Color(4.0));
+    scene.add(std::make_shared<Quad>(Point3(3.0, 1.0, -2.0), Vec3(2.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), diffuseLightMaterial));
+
+    Camera camera;
+
+    camera.aspectRatio      = 16.0 / 9.0;
+    camera.imageWidth       = 400;
+    camera.samplesPerPixel  = 100;
+    camera.maxDepth         = 50;
+    camera.backgroundColor  = Color(0.0);
+
+    camera.vertifcalFov     = 20;
+    camera.eyePosition      = Point3(26.0, 3.0, 6.0);
+    camera.lookAtPosition   = Point3(0.0, 2.0, 0.0);
+    camera.up               = Vec3(0.0, 1.0, 0.0);
+
+    camera.defocusAngle = 0;
+
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
     camera.render(*world);
 }
 
 
 int main() {
-    switch(5) {
+    switch(6) {
         case 1 : renderBouncingSpheres(); break;
         case 2 : renderCheckeredSpheres(); break;
         case 3 : renderEarth(); break;
         case 4 : renderPerlinSpheres(); break;
         case 5 : renderQuads(); break;
+        case 6 : renderSimpleLight(); break;
     }
 
     return 0;

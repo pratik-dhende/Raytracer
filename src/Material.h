@@ -13,6 +13,10 @@ public:
     virtual bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const {
         return false;
     }
+
+    virtual Color emit(const double u, const double v, const Point3& p) const {
+        return Color(0.0);
+    }
 };
 
 class Lambertian : public Material {
@@ -87,4 +91,18 @@ class Dielectric : public Material {
             r0 = r0 * r0;
             return r0 + (1.0 - r0) * std::pow((1.0 - cosine), 5.0);
         }
+};
+
+class DiffuseLight : public Material {
+public:
+    DiffuseLight(std::shared_ptr<Texture> emitter) : m_emitter(std::move(emitter)) {}
+
+    DiffuseLight(const Color& emitColor) : m_emitter(std::make_shared<SolidTexture>(emitColor)) {}
+
+    Color emit(const double u, const double v, const Point3& p) const override {
+        return m_emitter->value(u, v, p);
+    }
+
+private:
+    std::shared_ptr<Texture> m_emitter;
 };
