@@ -26,10 +26,10 @@ public:
     Lambertian(std::shared_ptr<Texture> albedo) : m_albedo(std::move(albedo)) {}
 
     bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const override {
-        auto scatteringDirection = hitInfo.getNormal() + Vec3::randomUnitVector();
+        auto scatteringDirection = hitInfo.normal + Vec3::randomUnitVector();
 
         if (scatteringDirection.nearZero()) {
-            scatteringDirection = hitInfo.getNormal();
+            scatteringDirection = hitInfo.normal;
         }
 
         scatteredRay = Ray(hitInfo.p, scatteringDirection, rayIn.time());
@@ -46,11 +46,11 @@ public:
     Metal(const Color& albedo, const double fuzz) : albedo(albedo), fuzz(std::min(1.0, fuzz)) {}
 
     bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const override {
-        auto scatteringDirection = Vec3::reflect(rayIn.direction(), hitInfo.getNormal());
+        auto scatteringDirection = Vec3::reflect(rayIn.direction(), hitInfo.normal);
         scatteringDirection = scatteringDirection.normalized() + this->fuzz * Vec3::randomUnitVector();
         scatteredRay = Ray(hitInfo.p, scatteringDirection, rayIn.time());
         attenuation = this->albedo;
-        return Vec3::dot(hitInfo.getNormal(), scatteringDirection) > 0.0;
+        return Vec3::dot(hitInfo.normal, scatteringDirection) > 0.0;
     }
 
 private:
@@ -63,19 +63,19 @@ class Dielectric : public Material {
         Dielectric(const double refractiveIndex) : refractiveIndex(refractiveIndex) {}
 
         bool scatter(const Ray& rayIn, const HitInfo& hitInfo, Color& attenuation, Ray& scatteredRay) const override {
-            double refractiveIndexReciprocal = hitInfo.getFront() ? (1.0 / this->refractiveIndex) : this->refractiveIndex;
+            double refractiveIndexReciprocal = hitInfo.front() ? (1.0 / this->refractiveIndex) : this->refractiveIndex;
 
             auto unitRayInDirection = rayIn.direction().normalized();
 
-            double cosTheta = std::min(Vec3::dot(-unitRayInDirection, hitInfo.getNormal()), 1.0);
+            double cosTheta = std::min(Vec3::dot(-unitRayInDirection, hitInfo.normal), 1.0);
             double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
             
             Vec3 scatteringDirection;
             if (refractiveIndexReciprocal * sinTheta > 1.0 || reflectance(cosTheta, refractiveIndexReciprocal) > randomDouble()) {
-                scatteringDirection = Vec3::reflect(unitRayInDirection, hitInfo.getNormal());
+                scatteringDirection = Vec3::reflect(unitRayInDirection, hitInfo.normal);
             }
             else {
-                scatteringDirection = Vec3::refract(unitRayInDirection, hitInfo.getNormal(), refractiveIndexReciprocal);
+                scatteringDirection = Vec3::refract(unitRayInDirection, hitInfo.normal, refractiveIndexReciprocal);
             }
 
             scatteredRay = Ray(hitInfo.p, scatteringDirection, rayIn.time());

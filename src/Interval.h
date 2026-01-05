@@ -59,3 +59,11 @@ public:
 
 const Interval Interval::EMPTY    = Interval(POSITIVE_INFINITY, -POSITIVE_INFINITY);
 const Interval Interval::UNIVERSE = Interval(-POSITIVE_INFINITY, POSITIVE_INFINITY);
+
+Interval operator+(const Interval& interval, double val) {
+    return Interval(interval.min + val, interval.max + val);
+}
+
+Interval operator+(double val, const Interval& interval) {
+    return interval + val;
+}

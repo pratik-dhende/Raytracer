@@ -84,6 +84,10 @@ public:
         return (index == 0) ? m_x : (index == 1 ? m_y : m_z);
     }
 
+    double& operator[](int index) {
+        return (index == 0) ? m_x : (index == 1 ? m_y : m_z);
+    }
+
     double magnitude() const {
         return std::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);;
     }

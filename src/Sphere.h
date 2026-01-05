@@ -47,7 +47,7 @@ class Sphere : public Hittable {
             hitInfo.p = ray.at(hitInfo.t);
 
             Vec3 outwardNormal = (hitInfo.p - this->center.at(ray.time())) / this->radius;
-            hitInfo.setNormal(ray, outwardNormal);
+            hitInfo.setOutwardNormal(ray, outwardNormal);
 
             getSphereUV(outwardNormal, hitInfo.u, hitInfo.v);
             hitInfo.material = material;

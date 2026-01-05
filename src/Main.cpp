@@ -243,8 +243,15 @@ void renderCornellBox() {
     scene.add(std::make_shared<Quad>(Point3(555, 555, 555), Vec3(-555, 0, 0), Vec3(0, 0,-555), white));
     scene.add(std::make_shared<Quad>(Point3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0), white));
 
-    scene.add(Quad::box(Point3(130, 0, 65), Point3(295, 165, 230), white));
-    scene.add(Quad::box(Point3(265, 0, 295), Point3(430, 330, 460), white));
+    std::shared_ptr<Hittable> box1 = Quad::box(Point3(0, 0, 0), Point3(165, 330, 165), white);
+    box1 = std::make_shared<RotateY>(box1, 15);
+    box1 = std::make_shared<Translate>(box1, Vec3(265, 0, 295));
+    scene.add(box1);
+
+    std::shared_ptr<Hittable> box2 = Quad::box(Point3(0, 0, 0), Point3(165, 165, 165), white);
+    box2 = std::make_shared<RotateY>(box2, -18);
+    box2 = std::make_shared<Translate>(box2, Vec3(130, 0, 65));
+    scene.add(box2);
 
     Camera camera;
 

@@ -7,30 +7,28 @@
 
 class Quad : public Hittable {
 public:
-    static std::shared_ptr<Scene> box(const Point3& a, const Point3& b, std::shared_ptr<Material> mat)
+    static std::shared_ptr<Hittable> box(const Point3& a, const Point3& b, std::shared_ptr<Material> material)
     {
-        // Returns the 3D box (six sides) that contains the two opposite vertices a & b.
-        auto sides = std::make_shared<Scene>();
+        auto boxScene = std::make_shared<Scene>();
 
-        // Construct the two opposite vertices with the minimum and maximum coordinates.
-        auto min = Point3(std::min(a.x(),b.x()), std::min(a.y(),b.y()), std::min(a.z(),b.z()));
-        auto max = Point3(std::max(a.x(),b.x()), std::max(a.y(),b.y()), std::max(a.z(),b.z()));
+        auto boxMin = Point3(std::min(a.x(),b.x()), std::min(a.y(),b.y()), std::min(a.z(),b.z()));
+        auto boxMax = Point3(std::max(a.x(),b.x()), std::max(a.y(),b.y()), std::max(a.z(),b.z()));
 
-        auto dx = Vec3(max.x() - min.x(), 0, 0);
-        auto dy = Vec3(0, max.y() - min.y(), 0);
-        auto dz = Vec3(0, 0, max.z() - min.z());
+        auto dx = Vec3(boxMax.x() - boxMin.x(), 0, 0);
+        auto dy = Vec3(0, boxMax.y() - boxMin.y(), 0);
+        auto dz = Vec3(0, 0, boxMax.z() - boxMin.z());
 
-        sides->add(std::make_shared<Quad>(Point3(min.x(), min.y(), max.z()),  dx,  dy, mat)); // front
-        sides->add(std::make_shared<Quad>(Point3(max.x(), min.y(), max.z()), -dz,  dy, mat)); // right
-        sides->add(std::make_shared<Quad>(Point3(max.x(), min.y(), min.z()), -dx,  dy, mat)); // back
-        sides->add(std::make_shared<Quad>(Point3(min.x(), min.y(), min.z()),  dz,  dy, mat)); // left
-        sides->add(std::make_shared<Quad>(Point3(min.x(), max.y(), max.z()),  dx, -dz, mat)); // top
-        sides->add(std::make_shared<Quad>(Point3(min.x(), min.y(), min.z()),  dx,  dz, mat)); // bottom
+        boxScene->add(std::make_shared<Quad>(Point3(boxMin.x(), boxMin.y(), boxMax.z()),  dx,  dy, material)); // front
+        boxScene->add(std::make_shared<Quad>(Point3(boxMax.x(), boxMin.y(), boxMax.z()), -dz,  dy, material)); // right
+        boxScene->add(std::make_shared<Quad>(Point3(boxMax.x(), boxMin.y(), boxMin.z()), -dx,  dy, material)); // back
+        boxScene->add(std::make_shared<Quad>(Point3(boxMin.x(), boxMin.y(), boxMin.z()),  dz,  dy, material)); // left
+        boxScene->add(std::make_shared<Quad>(Point3(boxMin.x(), boxMax.y(), boxMax.z()),  dx, -dz, material)); // top
+        boxScene->add(std::make_shared<Quad>(Point3(boxMin.x(), boxMin.y(), boxMin.z()),  dx,  dz, material)); // bottom
 
-        return sides;
+        return boxScene;
     }
 
-    Quad(const Point3& bottemLeft, const Vec3& u, const Vec3& v, std::shared_ptr<Material> material) : q(bottemLeft), u(u), v(v), material(std::move(material)){
+    Quad(const Point3& bottemLeft, const Vec3& u, const Vec3& v, std::shared_ptr<Material> material) : q(bottemLeft), u(u), v(v), m_material(std::move(material)){
         m_aabb = AABB(AABB(q, q + u + v), AABB(q + u, q + v));
 
         n = Vec3::cross(u, v);
@@ -64,8 +62,8 @@ public:
 
         hitInfo.t = t;
         hitInfo.p = ray.at(hitInfo.t);
-        hitInfo.setNormal(ray, n.normalized());
-        hitInfo.material = material;
+        hitInfo.setOutwardNormal(ray, n.normalized());
+        hitInfo.material = m_material;
 
         return true;
     }
@@ -80,7 +78,7 @@ private:
     AABB m_aabb;
     Point3 q;
     Vec3 u, v;
-    std::shared_ptr<Material> material;
+    std::shared_ptr<Material> m_material;
     Vec3 w;
     Vec3 n;
     double d;
