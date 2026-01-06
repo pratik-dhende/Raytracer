@@ -7,6 +7,7 @@
 #include "BVH.h"
 #include "Texture.h"
 #include "Quad.h"
+#include "ConstantMedium.h"
 
 #include <iostream>
 
@@ -272,15 +273,59 @@ void renderCornellBox() {
     camera.render(*world);
 }
 
+void renderCornellSmoke() {
+    Scene scene;
+
+    auto red   = std::make_shared<Lambertian>(Color(.65, .05, .05));
+    auto white = std::make_shared<Lambertian>(Color(.73, .73, .73));
+    auto green = std::make_shared<Lambertian>(Color(.12, .45, .15));
+    auto light = std::make_shared<DiffuseLight>(Color(7, 7, 7));
+
+    scene.add(std::make_shared<Quad>(Point3(555,0,0), Vec3(0,555,0), Vec3(0,0,555), green));
+    scene.add(std::make_shared<Quad>(Point3(0,0,0), Vec3(0,555,0), Vec3(0,0,555), red));
+    scene.add(std::make_shared<Quad>(Point3(113,554,127), Vec3(330,0,0), Vec3(0,0,305), light));
+    scene.add(std::make_shared<Quad>(Point3(0,555,0), Vec3(555,0,0), Vec3(0,0,555), white));
+    scene.add(std::make_shared<Quad>(Point3(0,0,0), Vec3(555,0,0), Vec3(0,0,555), white));
+    scene.add(std::make_shared<Quad>(Point3(0,  1  ,  2  ), Vec3(  4  ,  6  ,  8  ), Vec3(12 ,14 ,16 ), white));
+
+    // std::shared_ptr<Hittable> box1 = Quad::box(Point3(0,0,0), Point3(165,330,165), white);
+    // box1 = std::make_shared<RotateY>(box1, 15);
+    // box1 = std::make_shared<Translate>(box1, Vec3(265,0,295));
+
+    // std::shared_ptr<Hittable> box2 = Quad::box(Point3(0,0,0), Point3(165,165,165), white);
+    // box2 = std::make_shared<RotateY>(box2, -18);
+    // box2 = std::make_shared<Translate>(box2, Vec3(130,0,65));
+
+    // scene.add(std::make_shared<ConstantMedium>(box1, 0.01, Color(0,0,0)));
+    // scene.add(std::make_shared<ConstantMedium>(box2, 0.01, Color(1,1,1)));
+
+    Camera camera;
+
+    camera.aspectRatio      = 1.0;
+    camera.imageWidth       = 600;
+    camera.samplesPerPixel = 200;
+    camera.maxDepth         = 50;
+    camera.backgroundColor        = Color(0,0,0);
+
+    camera.verticalFov     = 40;
+    camera.eyePosition = Point3(278, 278, -800);
+    camera.lookAtPosition   = Point3(278, 278, 0);
+    camera.up      = Vec3(0,1,0);
+
+    camera.defocusAngle = 0;
+
+    camera.render(scene);
+}
+
 int main() {
-    switch(7) {
+    switch(8) {
         case 1 : renderBouncingSpheres(); break;
         case 2 : renderCheckeredSpheres(); break;
         case 3 : renderEarth(); break;
         case 4 : renderPerlinSpheres(); break;
         case 5 : renderQuads(); break;
         case 6 : renderSimpleLight(); break;
-        case 7 : renderCornellBox(); break;
+        case 7 : renderCornellSmoke(); break;
     }
 
     return 0;
