@@ -26,8 +26,12 @@ class ConstantMedium : public Hittable {
             return false;
 
         Interval hitInterval(entryHitInfo.t, exitHitInfo.t);
-        if (Interval::intersection(hitInterval, rayTInterval).size() <= 0.0)
+        Interval clippedInterval = Interval::intersection(hitInterval, rayTInterval);
+        if (clippedInterval.size() <= 0.0)
             return false;
+
+        entryHitInfo.t = clippedInterval.min;
+        exitHitInfo.t = clippedInterval.max;
 
         if (entryHitInfo.t < 0)
             entryHitInfo.t = 0;
