@@ -17,7 +17,7 @@
   <em>Figure 2: GPU render showcasing ray–sphere intersection, gamma correction, Lambertian, metallic (with fuzz), and dielectric materials (with total internal reflection and Schlick approximation), dynamic camera, and defocus blur.</em>
 </div>
 
-## Performance Improvements
+## Performance Comparison
 
 | Configuration       | Value      |
 |--------------------|-----------|
