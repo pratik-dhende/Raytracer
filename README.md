@@ -7,7 +7,7 @@
   <em>Figure 1: CPU render showcasing motion blur, BVH (AABB), texture mapping, Perlin noise, quad primitives, area lights, instancing, and constant-density media.</em>
 </div>
 
-<br /><br />
+<br />
 
 <div align="center">
   <img width="1200" height="675" alt="cudaSpheres" src="https://github.com/user-attachments/assets/1899bd32-08c5-43dc-830f-e8987ac683ee" />
@@ -26,8 +26,6 @@
 |--------------|---------|---------------------------------|
 | CUDA (no BVH) | 10.44× | 0h 04m 06s 148ms (246.148 seconds) |
 | CPU + BVH | 5.67× | 0h 07m 32s 982ms (452.983 seconds) |
-
-*CPU is single-threaded; BVH traversal is used on CPU. CUDA version is brute-force but massively parallel. The timing shows that GPU parallelism can outweigh algorithmic pruning for small-to-medium scenes.*
 
 ## Features
 
