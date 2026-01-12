@@ -10,6 +10,91 @@
 #include "ConstantMedium.h"
 
 #include <iostream>
+#include <chrono>
+
+void renderSpheres() {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    Scene scene;
+    
+    auto groundMaterial = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+    scene.add(std::make_shared<Sphere>(Point3(0.0 ,-1000.0 ,0.0), 1000.0, groundMaterial));
+
+    for (int a = -11; a < 11; ++a) {
+        for (int b = -11; b < 11; ++b) {
+            auto chosenMaterial = randomDouble();
+            Point3 center(a + 0.9 * randomDouble(), 0.2, b + 0.9 * randomDouble());
+
+            if ((center - Point3(4.0, 0.2, 0.0)).magnitude() > 0.9) {
+                std::shared_ptr<Material> sphereMaterial;
+
+                if (chosenMaterial < 0.8) {
+                    // Diffuse
+                    auto albedo = Color::randomDouble() * Color::randomDouble();
+                    sphereMaterial = std::make_shared<Lambertian>(albedo);
+                    scene.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                } 
+                else if (chosenMaterial < 0.95) {
+                    // Metal
+                    auto albedo = Color::randomDouble(0.5, 1);
+                    auto fuzz = randomDouble(0, 0.5);
+                    sphereMaterial = std::make_shared<Metal>(albedo, fuzz);
+                    scene.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                } 
+                else {
+                    // Glass
+                    sphereMaterial = std::make_shared<Dielectric>(1.5);
+                    scene.add(std::make_shared<Sphere>(center, 0.2, sphereMaterial));
+                }
+            }
+        }
+    }
+
+    auto material1 = std::make_shared<Dielectric>(1.5);
+    scene.add(std::make_shared<Sphere>(Point3(0.0, 1.0, 0.0), 1.0, material1));
+
+    auto material2 = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
+    scene.add(std::make_shared<Sphere>(Point3(-4.0, 1.0, 0.0), 1.0, material2));
+
+    auto material3 = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
+    scene.add(std::make_shared<Sphere>(Point3(4.0, 1.0, 0.0), 1.0, material3));
+
+    Camera camera;
+
+    camera.aspectRatio = 16.0 / 9.0;
+    camera.imageWidth = 1200;
+    camera.samplesPerPixel = 500;
+    camera.maxDepth = 50;
+
+    camera.verticalFov = 20.0;
+    camera.eyePosition = Point3(13.0, 2.0, 3.0);
+    camera.lookAtPosition = Point3(0.0, 0.0, 0.0);
+    camera.up = Vec3(0.0, 1.0, 0.0);
+
+    camera.defocusAngle = 0.6;
+    camera.focusDistance = 10.0;
+
+    camera.backgroundColor = Color(0.70, 0.80, 1.00);
+
+    std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
+    camera.render(*world);
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> totalSeconds = end - start;
+
+    int hours   = static_cast<int>(totalSeconds.count()) / 3600;
+    int minutes = (static_cast<int>(totalSeconds.count()) % 3600) / 60;
+    int seconds = static_cast<int>(totalSeconds.count()) % 60;
+    int millis  = static_cast<int>((totalSeconds.count() - static_cast<int>(totalSeconds.count())) * 1000);
+
+    std::clog   << "Total Render Time: "
+                << hours << "h "
+                << std::setw(2) << std::setfill('0') << minutes << "m "
+                << std::setw(2) << std::setfill('0') << seconds << "s "
+                << millis << "ms"
+                << " (" << totalSeconds.count() << " seconds)\n";
+}
 
 void renderBouncingSpheres() {
     Scene scene;
@@ -397,7 +482,7 @@ void renderFinalScene(int image_width, int samples_per_pixel, int max_depth) {
 }
 
 int main() {
-    switch(10) {
+    switch(11) {
         case 1 : renderBouncingSpheres(); break;
         case 2 : renderCheckeredSpheres(); break;
         case 3 : renderEarth(); break;
@@ -406,8 +491,9 @@ int main() {
         case 6 : renderSimpleLight(); break;
         case 7 : renderCornellBox(); break;
         case 8 : renderCornellSmoke(); break;
-        case 9:  renderFinalScene(800, 10000, 40); break;
-        default: renderFinalScene(400, 250, 4); break;
+        case 9 : renderFinalScene(800, 10000, 40); break;
+        case 10: renderFinalScene(400, 250, 4); break;
+        default: renderSpheres(); break;
     }
 
     return 0;
