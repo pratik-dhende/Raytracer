@@ -19,13 +19,17 @@
 
 ## Performance Improvements
 
-- Configuration: `1200×675, 500 spp, max depth 50` <br />
-- Base CPU Raytracer with none of the below optimization: `0h 42m 49s 688ms (2569.69 seconds)`
+| Configuration       | Value      |
+|--------------------|-----------|
+| Resolution          | 1200×675  |
+| Samples Per Pixel   | 500       |
+| Max Bounce Depth    | 50        |
 
-| Acceleration | Speedup | Time |
+| Acceleration | Speedup | Time (hh:mm:ss) |
 |--------------|---------|---------------------------------|
-| CUDA (no BVH) | 10.44× | 0h 04m 06s 148ms (246.148 seconds) |
-| CPU + BVH | 5.67× | 0h 07m 32s 982ms (452.983 seconds) |
+| `None` | `1x` | `00::42::49::688 (2569.69 seconds)` |
+| `CPU + BVH` | `5.67×` | `00:07:32.982 (452.983 seconds)` |
+| `CUDA (no BVH)` | `10.44×` | `00:04:06.148 (246.148 seconds)` |
 
 ## Features
 
