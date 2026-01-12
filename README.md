@@ -7,7 +7,7 @@
   <em>Figure 1: CPU render showcasing motion blur, BVH (AABB), texture mapping, Perlin noise, quad primitives, area lights, instancing, and constant-density media.</em>
 </div>
 
-<br />
+<br /><br />
 
 <div align="center">
   <img width="1200" height="675" alt="cudaSpheres" src="https://github.com/user-attachments/assets/1899bd32-08c5-43dc-830f-e8987ac683ee" />
@@ -30,29 +30,27 @@
 *CPU is single-threaded; BVH traversal is used on CPU. CUDA version is brute-force but massively parallel. The timing shows that GPU parallelism can outweigh algorithmic pruning for small-to-medium scenes.*
 
 ## Features
+
 This project explores building a Raytracer from scratch, with both CPU and CUDA-accelerated versions.
-- The [cuda](https://github.com/pratik-dhende/Raytracer/tree/cuda) branch includes a CUDA-accelerated version.
-  - Features
-    - Ray Sphere Intersection
-    - Gamma Correction
-    - Materials supported:
-      - Lambertian Material
-      - Metal (with fuzziness)
-      - Dielectric material with Total Internal Reflection and Schlick Approximation
-    - Dynamic Camera
-    - Defocus Blur  
-- The [main](https://github.com/pratik-dhende/Raytracer/tree/main) branch features a CPU-based raytracer with the same features as CUDA and additionally some new features.
-  - Additional features
-    - Motion Blur
-    - Bounding Volume Hierarchy
-      - Axis Aligned Bounding Box 
-    - Texture mapping
-    - Perlin Noise
-    - Quadrilateral primitive
-      - Ray plane intersection
-    - Area Lights
-    - Instance translation and rotation
-    - Constant Density Media
+
+| Feature | CPU Branch | CUDA Branch |
+|---------|------------|------------|
+| Ray–Sphere Intersection | ✅ | ✅ |
+| Gamma Correction | ✅ | ✅ |
+| Lambertian Material | ✅ | ✅ |
+| Metal (with fuzz) | ✅ | ✅ |
+| Dielectric (TIR + Schlick) | ✅ | ✅ |
+| Dynamic Camera | ✅ | ✅ |
+| Defocus Blur | ✅ | ✅ |
+| Motion Blur | ✅ | ❌ |
+| Bounding Volume Hierarchy (AABB) | ✅ | ❌ |
+| Texture Mapping | ✅ | ❌ |
+| Perlin Noise | ✅ | ❌ |
+| Quadrilateral Primitive (Ray–Plane Intersection) | ✅ | ❌ |
+| Area Lights | ✅ | ❌ |
+| Instance Translation/Rotation | ✅ | ❌ |
+| Constant-Density Media | ✅ | ❌ |
+
 
 ## Technological Stack
 `C++ • CUDA • CMake`
