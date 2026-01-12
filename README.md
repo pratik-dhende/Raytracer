@@ -9,10 +9,12 @@
 
 ## Performance Improvements
 
-| Acceleration | Speedup |
-|--------------|---------|
-| CUDA        | 7.25×   |
-| BVH          | 4.7×    |
+| Acceleration | Speedup | Configuration                   |
+|--------------|---------|---------------------------------|
+| [CUDA](https://github.com/pratik-dhende/Raytracer?tab=readme-ov-file#cuda-vs-cpu)         | 7.25×   | 1200×675, 500 spp, max depth 50 |     
+| [BVH](https://github.com/pratik-dhende/Raytracer?tab=readme-ov-file#bvh-vs-non-bvh)          | 4.7×    | 400×225, 100 spp, max depth 50  |
+
+*Speedups are measured with different configurations appropriate for each optimization; they are not directly comparable across rows.*
 
 ## Features
 This project explores building a Raytracer from scratch, with both CPU and CUDA-accelerated versions.
