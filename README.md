@@ -7,14 +7,27 @@
   <em>Figure 1: CPU Raytracer render showcasing motion blur, BVH (AABB), texture mapping, Perlin noise, quad primitives, area lights, instancing (translation/rotation), and constant-density media.</em>
 </div>
 
+<br />
+
+<div align="center">
+  <img width="1200" height="675" alt="cudaSpheres" src="https://github.com/user-attachments/assets/1899bd32-08c5-43dc-830f-e8987ac683ee" />
+
+
+  <br />
+  <em>Figure 2: GPU render showcasing ray–sphere intersection, gamma correction, Lambertian, metallic (with fuzz), and dielectric materials (with total internal reflection and Schlick approximation), dynamic camera motion, and defocus blur. </em>
+</div>
+
 ## Performance Improvements
 
-| Acceleration | Speedup | Configuration                   |
-|--------------|---------|---------------------------------|
-| [CUDA](https://github.com/pratik-dhende/Raytracer?tab=readme-ov-file#cuda-vs-cpu)         | 7.25×   | 1200×675, 500 spp, max depth 50 |     
-| [BVH](https://github.com/pratik-dhende/Raytracer?tab=readme-ov-file#bvh-vs-non-bvh)          | 4.7×    | 400×225, 100 spp, max depth 50  |
+- Configuration: `1200×675, 500 spp, max depth 50` <br />
+- Base CPU Raytracer with none of the below optimization: `0h 42m 49s 688ms (2569.69 seconds)`
 
-*Speedups are measured with different configurations appropriate for each optimization; they are not directly comparable across rows.*
+| Acceleration | Speedup | Time |
+|--------------|---------|---------------------------------|
+| CUDA (no BVH) | 10.44× |  04m 06s 148ms (246.148 seconds) |
+| CPU + BVH | 5.67× | 0h 07m 32s 982ms (452.983 seconds) |
+
+*CPU is single-threaded; BVH traversal is used on CPU. CUDA version is brute-force but massively parallel. The timing shows that GPU parallelism can outweigh algorithmic pruning for small-to-medium scenes.*
 
 ## Features
 This project explores building a Raytracer from scratch, with both CPU and CUDA-accelerated versions.
@@ -43,64 +56,6 @@ This project explores building a Raytracer from scratch, with both CPU and CUDA-
 
 ## Technological Stack
 `C++ • CUDA • CMake`
-
-## BVH vs Non-BVH
-- The images below were rendered at a resolution of 400 × 225, using 100 samples per pixel and a maximum ray bounce depth of 50.
-- This configuration results in up to 450 million rays traced in the worst case.
-- The scene shown in Fig. 2.1 was rendered in under 14.5 seconds (Fig. 2.2) with BVH acceleration.
-- For comparison, the scene in Fig. 3.1, rendered with the same configuration as Fig. 2.1, took 1 minute and 8 seconds with the BVH (Fig. 3.2), achieving a `4.7x` speedup with BVH acceleration.
-
-<table>
-  <tr>
-    <td><img width="400" height="225" alt="bvh" src="https://github.com/user-attachments/assets/c186b57d-8f1f-4cd9-bf6e-95557ad5c094" /></td>
-    <td><img width="400" height="225" alt="no_bvh" src="https://github.com/user-attachments/assets/4030ebdb-a5e5-4716-ae07-d926a39ae4e1" /></td>
-</td>
-  </tr>
-  <tr>
-    <td align="center"><em>Figure 2.1: BVH Render Output</em></td>
-    <td align="center"><em>Figure 3.1: Non-BVH Render Output</em></td>
-  </tr>
-
-  <tr>
-    <td><img width="352" height="65" alt="bvh" src="https://github.com/user-attachments/assets/d67e48d2-d04a-4a37-8d02-014b39815292" />
-
-</td>
-    <td><img width="363" height="58" alt="no_bvh" src="https://github.com/user-attachments/assets/8cb23bf0-e8e0-4aef-a163-6fd7deb7ef9b" />
-</td>
-  </tr>
-  <tr>
-    <td align="center"><em>Figure 2.2: BVH Rendering Time (hh:mm:ss)</em></td>
-    <td align="center"><em>Figure 3.2: Non-BVH Rendering Time (hh:mm:ss)</em></td>
-  </tr>
-</table>
-
-## CUDA vs CPU
-- The images below were rendered at a resolution of 1200 × 675, using 500 samples per pixel and a maximum ray bounce depth of 50.
-- This configuration results in up to 20.25 billion rays traced in the worst case.
-- The scene shown in Fig. 4.1 was rendered in under 4 minutes and 32 seconds (Fig. 4.2) with CUDA acceleration.
-- For comparison, the scene in Fig. 5.1, rendered with the same configuration as Fig. 5.1, took 32 minutes and 53 seconds on the CPU (Fig. 5.2), achieving a `7.25×` speedup with GPU acceleration.
-
-<table>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/8ffade08-0ae4-4dc1-95fb-58d2bc7962e2" width="1200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/ea087ffc-0d40-4de1-b4a0-a3b1dc3d3f89" width="1200"/></td>
-  </tr>
-  <tr>
-    <td align="center"><em>Figure 4.1: GPU Render Output</em></td>
-    <td align="center"><em>Figure 5.1: CPU Render Output</em></td>
-  </tr>
-
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/1990977c-e7fb-4d90-9b4a-f7871165efe3" width ="1200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/3f4d0bf3-ae4b-4092-a8eb-07a819ce2419" width="1200"/></td>
-  </tr>
-  <tr>
-    <td align="center"><em>Figure 4.2: GPU Rendering Time (hh:mm:ss)</em></td>
-    <td align="center"><em>Figure 5.2: CPU Rendering Time (hh:mm:ss)</em></td>
-  </tr>
-</table>
-  
-
 
 ## How to Run 
 The project uses [CMake](https://cmake.org/) as the meta build system.
