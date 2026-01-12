@@ -7,11 +7,14 @@
 #include "Cuda.h"
 
 #include <iostream>
+#include <chrono>
+#include <iomanip>
 
 namespace Cuda {
     __device__
     Color rayColor(const Ray& ray, const Hittable& world, int depth, curandState& randState) {
         Color pixelColor(1.0);
+        Color backgroundColor(0.7, 0.8, 1.0);
         Ray incidentRay = ray;
 
         Color attenuation;
@@ -30,9 +33,7 @@ namespace Cuda {
                 }
             }
             else {
-                Vec3 unitDirection = incidentRay.direction().normalized();
-                auto a = 0.5 * (unitDirection.y() + 1.0);
-                pixelColor *= (1.0 - a) * Color(1.0) + a * Color(0.5, 0.7, 1.0);
+                pixelColor *= backgroundColor;
                 break;
             }
             --depth;
@@ -207,6 +208,8 @@ int main() {
 
     std::clog << "Grid Dimensions: (" << gridDimensions.x << ", " << gridDimensions.y << ") " << "Block Dimensions: (" << blockDimensions.x << ", " << blockDimensions.y << ")\n";
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     // Render
     Cuda::render<<<gridDimensions, blockDimensions>>>(d_world.get(), d_frameBuffer.get(), d_camera.get(), d_pixelRandStates.get());
     checkCudaErrors(cudaGetLastError());
@@ -217,6 +220,22 @@ int main() {
     for(int i = 0; i < framebufferSize; i++) {
         write_color(std::cout, d_frameBuffer[i]);
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> totalSeconds = end - start;
+
+    int hours   = static_cast<int>(totalSeconds.count()) / 3600;
+    int minutes = (static_cast<int>(totalSeconds.count()) % 3600) / 60;
+    int seconds = static_cast<int>(totalSeconds.count()) % 60;
+    int millis  = static_cast<int>((totalSeconds.count() - static_cast<int>(totalSeconds.count())) * 1000);
+
+    std::clog   << "Total Render Time: "
+                << hours << "h "
+                << std::setw(2) << std::setfill('0') << minutes << "m "
+                << std::setw(2) << std::setfill('0') << seconds << "s "
+                << millis << "ms"
+                << " (" << totalSeconds.count() << " seconds)\n";
 
     // Free device memory
     Cuda::deleteScene<<<1, 1>>>(d_world.get());
