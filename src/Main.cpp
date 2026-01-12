@@ -13,8 +13,6 @@
 #include <chrono>
 
 void renderSpheres() {
-    auto start = std::chrono::high_resolution_clock::now();
-
     Scene scene;
     
     auto groundMaterial = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
@@ -77,8 +75,9 @@ void renderSpheres() {
     camera.backgroundColor = Color(0.70, 0.80, 1.00);
 
     std::shared_ptr<Hittable> world = std::make_shared<BVH>(scene.hittables());
-    camera.render(*world);
 
+    auto start = std::chrono::high_resolution_clock::now();
+    camera.render(*world);
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> totalSeconds = end - start;
